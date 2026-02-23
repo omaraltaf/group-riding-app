@@ -39,7 +39,7 @@ export async function GET(req: Request) {
             take: 50,
         });
 
-        const formattedGroups = groups.map(group => ({
+        const formattedGroups = groups.map((group: any) => ({
             ...group,
             myStatus: group.memberships[0]?.status || null,
             myRole: group.memberships[0]?.role || null,

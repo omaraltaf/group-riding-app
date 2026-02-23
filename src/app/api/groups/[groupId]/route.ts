@@ -35,7 +35,7 @@ export async function GET(
         if (!group) return new NextResponse("Group not found", { status: 404 });
 
         // Check if user is a member
-        const membership = group.memberships.find(m => m.userId === user.id);
+        const membership = group.memberships.find((m: any) => m.userId === user.id);
         const isAdmin = membership?.role === "ADMIN";
 
         if (!membership && group.joinPolicy === "REQUEST_ONLY") {
