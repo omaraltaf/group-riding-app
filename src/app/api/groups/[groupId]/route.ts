@@ -126,7 +126,7 @@ export async function DELETE(
             where: { groupId },
             select: { id: true },
         });
-        const rideIds = rides.map((r) => r.id);
+        const rideIds = rides.map((r: any) => r.id);
 
         await prisma.$transaction([
             // Delete RSVPs for all rides in this group
