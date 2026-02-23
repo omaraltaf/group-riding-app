@@ -143,81 +143,80 @@ export default function DiscoverRidesPage() {
                         </button>
                     )}
                 </div>
-            </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {filteredRides.length === 0 ? (
+                        <div className="col-span-full p-20 text-center bg-zinc-900 rounded-[2.5rem] ring-1 ring-zinc-800">
+                            <Calendar className="h-12 w-12 text-zinc-700 mx-auto mb-4" />
+                            <h3 className="text-xl font-bold mb-2">No rides found</h3>
+                            <p className="text-zinc-500">Try adjusting your search or check back later for new rides.</p>
+                        </div>
+                    ) : (
+                        filteredRides.map(ride => (
+                            <Link
+                                key={ride.id}
+                                href={`/rides/${ride.id}`}
+                                className="group relative overflow-hidden rounded-[2rem] bg-zinc-900 p-8 ring-1 ring-zinc-800 hover:ring-orange-500/50 transition-all hover:bg-zinc-900/50 flex flex-col justify-between shadow-2xl shadow-black/50"
+                            >
+                                <div>
+                                    <div className="flex justify-between items-start mb-6">
+                                        <div className="flex gap-2">
+                                            <span className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ring-1 ${ride.terrainDifficulty === "Expert" ? "bg-red-500/10 text-red-500 ring-red-500/20" :
+                                                ride.terrainDifficulty === "Medium" ? "bg-orange-500/10 text-orange-500 ring-orange-500/20" :
+                                                    "bg-emerald-500/10 text-emerald-500 ring-emerald-500/20"
+                                                }`}>
+                                                {ride.terrainDifficulty}
+                                            </span>
+                                            <span className="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-zinc-800 text-zinc-400 ring-1 ring-zinc-700">
+                                                Public
+                                            </span>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-sm font-black text-orange-500">
+                                                {(() => {
+                                                    const date = new Date(ride.startTime);
+                                                    const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+                                                    return `${months[date.getMonth()]} ${date.getDate()}`;
+                                                })()}
+                                            </p>
+                                            <p className="text-[10px] text-zinc-500 font-bold">
+                                                {(() => {
+                                                    const date = new Date(ride.startTime);
+                                                    const hours = date.getHours().toString().padStart(2, '0');
+                                                    const minutes = date.getMinutes().toString().padStart(2, '0');
+                                                    return `${hours}:${minutes}`;
+                                                })()}
+                                            </p>
+                                        </div>
+                                    </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {filteredRides.length === 0 ? (
-                    <div className="col-span-full p-20 text-center bg-zinc-900 rounded-[2.5rem] ring-1 ring-zinc-800">
-                        <Calendar className="h-12 w-12 text-zinc-700 mx-auto mb-4" />
-                        <h3 className="text-xl font-bold mb-2">No rides found</h3>
-                        <p className="text-zinc-500">Try adjusting your search or check back later for new rides.</p>
-                    </div>
-                ) : (
-                    filteredRides.map(ride => (
-                        <Link
-                            key={ride.id}
-                            href={`/rides/${ride.id}`}
-                            className="group relative overflow-hidden rounded-[2rem] bg-zinc-900 p-8 ring-1 ring-zinc-800 hover:ring-orange-500/50 transition-all hover:bg-zinc-900/50 flex flex-col justify-between shadow-2xl shadow-black/50"
-                        >
-                            <div>
-                                <div className="flex justify-between items-start mb-6">
-                                    <div className="flex gap-2">
-                                        <span className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ring-1 ${ride.terrainDifficulty === "Expert" ? "bg-red-500/10 text-red-500 ring-red-500/20" :
-                                            ride.terrainDifficulty === "Medium" ? "bg-orange-500/10 text-orange-500 ring-orange-500/20" :
-                                                "bg-emerald-500/10 text-emerald-500 ring-emerald-500/20"
-                                            }`}>
-                                            {ride.terrainDifficulty}
-                                        </span>
-                                        <span className="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-zinc-800 text-zinc-400 ring-1 ring-zinc-700">
-                                            Public
-                                        </span>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-sm font-black text-orange-500">
-                                            {(() => {
-                                                const date = new Date(ride.startTime);
-                                                const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-                                                return `${months[date.getMonth()]} ${date.getDate()}`;
-                                            })()}
-                                        </p>
-                                        <p className="text-[10px] text-zinc-500 font-bold">
-                                            {(() => {
-                                                const date = new Date(ride.startTime);
-                                                const hours = date.getHours().toString().padStart(2, '0');
-                                                const minutes = date.getMinutes().toString().padStart(2, '0');
-                                                return `${hours}:${minutes}`;
-                                            })()}
-                                        </p>
-                                    </div>
+                                    <h3 className="text-xl font-black group-hover:text-orange-500 transition-colors mb-2">{ride.title}</h3>
+                                    <p className="text-sm text-zinc-400 mb-4 font-bold flex items-center gap-1.5 opacity-70">
+                                        Organized by <span className="text-zinc-300">{ride.group.name}</span>
+                                    </p>
+                                    <p className="text-sm text-zinc-500 line-clamp-2 mb-8 leading-relaxed font-medium italic">
+                                        "{ride.description}"
+                                    </p>
                                 </div>
 
-                                <h3 className="text-xl font-black group-hover:text-orange-500 transition-colors mb-2">{ride.title}</h3>
-                                <p className="text-sm text-zinc-400 mb-4 font-bold flex items-center gap-1.5 opacity-70">
-                                    Organized by <span className="text-zinc-300">{ride.group.name}</span>
-                                </p>
-                                <p className="text-sm text-zinc-500 line-clamp-2 mb-8 leading-relaxed font-medium italic">
-                                    "{ride.description}"
-                                </p>
-                            </div>
-
-                            <div className="flex items-center justify-between pt-6 border-t border-zinc-800/50">
-                                <div className="flex items-center gap-4">
-                                    <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-400">
-                                        <UsersIcon className="h-4 w-4 text-orange-500" />
-                                        {ride._count.rsvps} joined
+                                <div className="flex items-center justify-between pt-6 border-t border-zinc-800/50">
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-400">
+                                            <UsersIcon className="h-4 w-4 text-orange-500" />
+                                            {ride._count.rsvps} joined
+                                        </div>
+                                        <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-400">
+                                            <MapPin className="h-4 w-4 text-orange-500" />
+                                            {ride.meetingPoint}
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-400">
-                                        <MapPin className="h-4 w-4 text-orange-500" />
-                                        {ride.meetingPoint}
+                                    <div className="h-10 w-10 rounded-xl bg-zinc-800 flex items-center justify-center group-hover:bg-orange-600 transition-all active:scale-95 group-hover:shadow-lg group-hover:shadow-orange-950/20">
+                                        <Trophy className="h-5 w-5 text-zinc-500 group-hover:text-white" />
                                     </div>
                                 </div>
-                                <div className="h-10 w-10 rounded-xl bg-zinc-800 flex items-center justify-center group-hover:bg-orange-600 transition-all active:scale-95 group-hover:shadow-lg group-hover:shadow-orange-950/20">
-                                    <Trophy className="h-5 w-5 text-zinc-500 group-hover:text-white" />
-                                </div>
-                            </div>
-                        </Link>
-                    ))
-                )}
+                            </Link>
+                        ))
+                    )}
+                </div>
             </div>
         </main>
     );
