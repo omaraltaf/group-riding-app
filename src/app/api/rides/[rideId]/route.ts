@@ -51,7 +51,7 @@ export async function GET(
             return new NextResponse("Forbidden", { status: 403 });
         }
 
-        const myRsvp = ride.rsvps.find(r => r.userId === user.id);
+        const myRsvp = ride.rsvps.find((r: any) => r.userId === user.id);
 
         return NextResponse.json({
             ...ride,
