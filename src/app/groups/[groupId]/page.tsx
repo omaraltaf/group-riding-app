@@ -69,6 +69,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("rides");
     const [copied, setCopied] = useState(false);
+    const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
     useEffect(() => {
         fetch(`/api/groups/${groupId}`)
@@ -124,10 +125,13 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const handleLeaveGroup = async (e: React.MouseEvent) => {
+    const handleLeaveGroup = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        if (!confirm("Are you sure you want to leave this group?")) return;
+        setShowLeaveConfirm(true);
+    };
+
+    const confirmLeave = async () => {
         try {
             const res = await fetch(`/api/groups/${groupId}/members`, {
                 method: "DELETE",
@@ -137,6 +141,8 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
             }
         } catch (err) {
             console.error(err);
+        } finally {
+            setShowLeaveConfirm(false);
         }
     };
 
@@ -404,6 +410,31 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                     </div>
                 </div>
             </div>
+            {showLeaveConfirm && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="h-16 w-16 bg-red-500/10 rounded-2xl flex items-center justify-center mb-6">
+                            <LogOut className="h-8 w-8 text-red-500" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-white mb-2">Leave Group?</h2>
+                        <p className="text-zinc-400 mb-8">Are you sure you want to leave this group? You will need an invite or request access to join again.</p>
+                        <div className="flex flex-col gap-3">
+                            <button
+                                onClick={confirmLeave}
+                                className="w-full py-4 bg-red-600 hover:bg-red-500 text-white font-bold rounded-2xl transition-all active:scale-[0.98]"
+                            >
+                                Yes, Leave Group
+                            </button>
+                            <button
+                                onClick={() => setShowLeaveConfirm(false)}
+                                className="w-full py-4 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-2xl transition-all active:scale-[0.98]"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }
