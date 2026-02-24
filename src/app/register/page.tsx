@@ -45,7 +45,7 @@ export default function RegisterPage() {
             <div className="w-full max-w-md space-y-8 rounded-2xl bg-zinc-900 p-8 shadow-2xl ring-1 ring-zinc-800">
                 <div className="text-center">
                     <h2 className="text-3xl font-bold tracking-tight text-white">Create Account</h2>
-                    <p className="mt-2 text-zinc-400">Join the TripKarLo community</p>
+                    <p className="mt-2 text-zinc-400">Join the ToliRides community</p>
                 </div>
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     {error && (

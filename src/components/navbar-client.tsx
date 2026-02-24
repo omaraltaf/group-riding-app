@@ -30,7 +30,7 @@ export default function NavbarClient({ user, unreadCount }: NavbarClientProps) {
                         <Link href="/" className="h-10 w-10 rounded-xl bg-orange-600 flex items-center justify-center hover:bg-orange-500 transition-all active:scale-95 shadow-lg shadow-orange-950/20">
                             <Plus className="text-white h-6 w-6" />
                         </Link>
-                        <span className="text-xl font-bold tracking-tight text-white">TripKarLo</span>
+                        <span className="text-xl font-bold tracking-tight text-white">ToliRides</span>
                     </div>
 
                     <div className="flex items-center gap-4">
