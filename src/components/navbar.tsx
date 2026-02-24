@@ -13,7 +13,10 @@ export default async function Navbar() {
 
     return (
         <NavbarClient
-            user={{ name: user.name, image: user.image }}
+            user={{
+                name: user.name ?? null,
+                image: user.image ?? null
+            }}
             unreadCount={unreadNotificationsCount}
         />
     );
