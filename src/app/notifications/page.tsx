@@ -19,6 +19,7 @@ interface Notification {
     message: string;
     isRead: boolean;
     createdAt: string;
+    relatedId?: string;
 }
 
 export default function NotificationsPage() {
@@ -54,10 +55,34 @@ export default function NotificationsPage() {
 
     const getIcon = (type: string) => {
         switch (type) {
-            case "RIDE_UPDATE": return <Calendar className="h-5 w-5 text-orange-500" />;
-            case "GROUP_INVITE": return <Users className="h-5 w-5 text-blue-500" />;
+            case "RIDE_UPDATE":
+            case "RIDE_NEW":
+            case "RIDE_CANCEL":
+                return <Calendar className="h-5 w-5 text-orange-500" />;
+            case "GROUP_INVITE":
+            case "GROUP_JOIN":
+                return <Users className="h-5 w-5 text-blue-500" />;
             case "JOIN_REQUEST": return <AlertCircle className="h-5 w-5 text-yellow-500" />;
+            case "MESSAGE": return <Info className="h-5 w-5 text-zinc-500" />;
             default: return <Info className="h-5 w-5 text-zinc-500" />;
+        }
+    };
+
+    const getLink = (type: string, relatedId?: string) => {
+        if (!relatedId) return null;
+        switch (type) {
+            case "GROUP_INVITE":
+            case "JOIN_REQUEST":
+            case "GROUP_JOIN":
+            case "JOIN_REJECT":
+                return `/groups/${relatedId}`;
+            case "RIDE_UPDATE":
+            case "RIDE_NEW":
+            case "MESSAGE":
+            case "RIDE_CANCEL":
+                return `/rides/${relatedId}`;
+            default:
+                return null;
         }
     };
 
@@ -91,36 +116,60 @@ export default function NotificationsPage() {
                             <p className="text-zinc-500">You don't have any new notifications at the moment.</p>
                         </div>
                     ) : (
-                        notifications.map(notification => (
-                            <div
-                                key={notification.id}
-                                className={`p-6 bg-zinc-900 rounded-3xl ring-1 transition-all flex items-start gap-4 ${notification.isRead ? "ring-zinc-800 border-0 opacity-60" : "ring-orange-500/30 border-l-4 border-orange-500 shadow-xl shadow-orange-950/10"
-                                    }`}
-                            >
-                                <div className="h-10 w-10 bg-zinc-800 rounded-xl flex items-center justify-center shrink-0">
-                                    {getIcon(notification.type)}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-center justify-between mb-1">
-                                        <h3 className="font-bold text-lg truncate">{notification.title}</h3>
-                                        <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest px-2 py-0.5 bg-zinc-800 rounded-md">
-                                            {new Date(notification.createdAt).toLocaleDateString()}
-                                        </span>
+                        notifications.map(notification => {
+                            const link = getLink(notification.type, notification.relatedId);
+                            const content = (
+                                <>
+                                    <div className="h-10 w-10 bg-zinc-800 rounded-xl flex items-center justify-center shrink-0">
+                                        {getIcon(notification.type)}
                                     </div>
-                                    <p className="text-zinc-400 text-sm leading-relaxed mb-4">
-                                        {notification.message}
-                                    </p>
-                                    {!notification.isRead && (
-                                        <button
-                                            onClick={() => markAsRead(notification.id)}
-                                            className="flex items-center gap-1.5 text-xs font-black text-orange-500 hover:text-orange-400 transition-colors uppercase tracking-wider"
-                                        >
-                                            <Check className="h-3 w-3" /> Mark as read
-                                        </button>
-                                    )}
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <h3 className="font-bold text-lg truncate">{notification.title}</h3>
+                                            <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest px-2 py-0.5 bg-zinc-800 rounded-md">
+                                                {new Date(notification.createdAt).toLocaleDateString()}
+                                            </span>
+                                        </div>
+                                        <p className="text-zinc-400 text-sm leading-relaxed mb-4">
+                                            {notification.message}
+                                        </p>
+                                        {!notification.isRead && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    markAsRead(notification.id);
+                                                }}
+                                                className="flex items-center gap-1.5 text-xs font-black text-orange-500 hover:text-orange-400 transition-colors uppercase tracking-wider relative z-10"
+                                            >
+                                                <Check className="h-3 w-3" /> Mark as read
+                                            </button>
+                                        )}
+                                    </div>
+                                </>
+                            );
+
+                            const cardClasses = `p-6 bg-zinc-900 rounded-3xl ring-1 transition-all flex items-start gap-4 ${notification.isRead ? "ring-zinc-800 border-0 opacity-60" : "ring-orange-500/30 border-l-4 border-orange-500 shadow-xl shadow-orange-950/10"
+                                } hover:bg-zinc-800/50`;
+
+                            if (link) {
+                                return (
+                                    <Link
+                                        key={notification.id}
+                                        href={link}
+                                        className={cardClasses}
+                                    >
+                                        {content}
+                                    </Link>
+                                );
+                            }
+
+                            return (
+                                <div key={notification.id} className={cardClasses}>
+                                    {content}
                                 </div>
-                            </div>
-                        ))
+                            );
+                        })
                     )}
                 </div>
             </div>
