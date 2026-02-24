@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ToliRides",
+  title: "TripKarLo",
   description: "Ride Together, Explore Further with the ultimate group riding platform.",
 };
 

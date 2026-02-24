@@ -15,7 +15,7 @@ export default async function Home() {
               Ride Together, Explore Further.
             </h1>
             <p className="mt-8 text-lg font-medium text-zinc-400 sm:text-xl">
-              ToliRides is the ultimate platform for group riding enthusiasts. Create groups, plan routes, and explore the open road with your community.
+              TripKarLo is the ultimate platform for group riding enthusiasts. Create groups, plan routes, and explore the open road with your community.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <Link
