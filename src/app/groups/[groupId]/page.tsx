@@ -124,7 +124,9 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const handleLeaveGroup = async () => {
+    const handleLeaveGroup = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
         if (!confirm("Are you sure you want to leave this group?")) return;
         try {
             const res = await fetch(`/api/groups/${groupId}/members`, {
