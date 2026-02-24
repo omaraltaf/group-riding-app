@@ -15,6 +15,22 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "TripKarLo",
   description: "Ride Together, Explore Further with the ultimate group riding platform.",
+  icons: {
+    icon: "/favicon.png",
+    apple: "/favicon.png",
+  },
+  openGraph: {
+    title: "TripKarLo",
+    description: "Ride Together, Explore Further with the ultimate group riding platform.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1024,
+        height: 1024,
+        alt: "TripKarLo Logo",
+      },
+    ],
+  },
 };
 
 import { Providers } from "@/components/providers";
