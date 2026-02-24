@@ -16,8 +16,8 @@ export const metadata: Metadata = {
   title: "TripKarLo",
   description: "Ride Together, Explore Further with the ultimate group riding platform.",
   icons: {
-    icon: "/favicon.png",
-    apple: "/favicon.png",
+    icon: "/favicon.ico",
+    apple: "/favicon.ico",
   },
   openGraph: {
     title: "TripKarLo",
