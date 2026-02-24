@@ -13,17 +13,21 @@ export async function POST(
         const user = await getCurrentUser();
         if (!user) return new NextResponse("Unauthorized", { status: 401 });
 
-        const membership = await prisma.membership.findUnique({
-            where: {
-                userId_groupId: {
-                    userId: user.id,
-                    groupId: groupId,
-                },
-            },
-        });
+        const isPlatformAdmin = user.role === "PLATFORM_ADMIN";
 
-        if (!membership || membership.role !== "ADMIN") {
-            return new NextResponse("Forbidden", { status: 403 });
+        if (!isPlatformAdmin) {
+            const membership = await prisma.membership.findUnique({
+                where: {
+                    userId_groupId: {
+                        userId: user.id,
+                        groupId: groupId,
+                    },
+                },
+            });
+
+            if (!membership || membership.role !== "ADMIN") {
+                return new NextResponse("Forbidden", { status: 403 });
+            }
         }
 
         const body = await req.json();

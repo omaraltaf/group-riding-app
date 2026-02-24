@@ -36,9 +36,10 @@ export async function GET(
 
         // Check if user is a member
         const membership = group.memberships.find((m: any) => m.userId === user.id);
-        const isAdmin = membership?.role === "ADMIN";
+        const isPlatformAdmin = user.role === "PLATFORM_ADMIN";
+        const isAdmin = isPlatformAdmin || membership?.role === "ADMIN";
 
-        if (!membership && group.joinPolicy === "REQUEST_ONLY") {
+        if (!membership && group.joinPolicy === "REQUEST_ONLY" && !isPlatformAdmin) {
             // Return limited info if not public
             return NextResponse.json({
                 id: group.id,
@@ -71,17 +72,21 @@ export async function PATCH(
         const user = await getCurrentUser();
         if (!user) return new NextResponse("Unauthorized", { status: 401 });
 
-        const membership = await prisma.membership.findUnique({
-            where: {
-                userId_groupId: {
-                    userId: user.id,
-                    groupId: groupId,
-                },
-            },
-        });
+        const isPlatformAdmin = user.role === "PLATFORM_ADMIN";
 
-        if (!membership || membership.role !== "ADMIN") {
-            return new NextResponse("Forbidden", { status: 403 });
+        if (!isPlatformAdmin) {
+            const membership = await prisma.membership.findUnique({
+                where: {
+                    userId_groupId: {
+                        userId: user.id,
+                        groupId: groupId,
+                    },
+                },
+            });
+
+            if (!membership || membership.role !== "ADMIN") {
+                return new NextResponse("Forbidden", { status: 403 });
+            }
         }
 
         const body = await req.json();
@@ -108,17 +113,21 @@ export async function DELETE(
         const user = await getCurrentUser();
         if (!user) return new NextResponse("Unauthorized", { status: 401 });
 
-        const membership = await prisma.membership.findUnique({
-            where: {
-                userId_groupId: {
-                    userId: user.id,
-                    groupId: groupId,
-                },
-            },
-        });
+        const isPlatformAdmin = user.role === "PLATFORM_ADMIN";
 
-        if (!membership || membership.role !== "ADMIN") {
-            return new NextResponse("Forbidden", { status: 403 });
+        if (!isPlatformAdmin) {
+            const membership = await prisma.membership.findUnique({
+                where: {
+                    userId_groupId: {
+                        userId: user.id,
+                        groupId: groupId,
+                    },
+                },
+            });
+
+            if (!membership || membership.role !== "ADMIN") {
+                return new NextResponse("Forbidden", { status: 403 });
+            }
         }
 
         // Manual cascade delete because Prisma schema doesn't have onDelete: Cascade

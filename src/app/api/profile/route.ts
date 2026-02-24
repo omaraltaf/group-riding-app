@@ -13,10 +13,13 @@ export async function PATCH(req: Request) {
         }
 
         const body = await req.json();
-        const { name, phone, bikeTypes, ridingExperience, image, pushOptIn } = body;
+        const { name, phone, bikeTypes, ridingExperience, image, pushOptIn, targetUserId } = body;
+
+        const isPlatformAdmin = user.role === "PLATFORM_ADMIN";
+        const finalUserId = (isPlatformAdmin && targetUserId) ? targetUserId : user.id;
 
         const updatedUser = await prisma.user.update({
-            where: { id: user.id },
+            where: { id: finalUserId },
             data: {
                 name,
                 phone: phone === "" ? null : phone,

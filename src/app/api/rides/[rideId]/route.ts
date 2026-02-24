@@ -47,7 +47,9 @@ export async function GET(
             }
         });
 
-        if (!membership && !ride.isPublic) {
+        const isPlatformAdmin = user.role === "PLATFORM_ADMIN";
+
+        if (!membership && !ride.isPublic && !isPlatformAdmin) {
             return new NextResponse("Forbidden", { status: 403 });
         }
 
@@ -56,7 +58,7 @@ export async function GET(
         return NextResponse.json({
             ...ride,
             isMember: !!membership,
-            isAdmin: membership?.role === "ADMIN",
+            isAdmin: isPlatformAdmin || membership?.role === "ADMIN",
             isCreator: ride.creatorId === user.id,
             myRsvp: myRsvp?.status || null,
         });
@@ -81,17 +83,21 @@ export async function PATCH(
 
         if (!ride) return new NextResponse("Ride not found", { status: 404 });
 
-        const membership = await prisma.membership.findUnique({
-            where: {
-                userId_groupId: {
-                    userId: user.id,
-                    groupId: ride.groupId
-                }
-            }
-        });
+        const isPlatformAdmin = user.role === "PLATFORM_ADMIN";
 
-        if (!membership || (membership.role !== "ADMIN" && ride.creatorId !== user.id)) {
-            return new NextResponse("Forbidden", { status: 403 });
+        if (!isPlatformAdmin) {
+            const membership = await prisma.membership.findUnique({
+                where: {
+                    userId_groupId: {
+                        userId: user.id,
+                        groupId: ride.groupId
+                    }
+                }
+            });
+
+            if (!membership || (membership.role !== "ADMIN" && ride.creatorId !== user.id)) {
+                return new NextResponse("Forbidden", { status: 403 });
+            }
         }
 
         const body = await req.json();
@@ -152,17 +158,21 @@ export async function DELETE(
 
         if (!ride) return new NextResponse("Ride not found", { status: 404 });
 
-        const membership = await prisma.membership.findUnique({
-            where: {
-                userId_groupId: {
-                    userId: user.id,
-                    groupId: ride.groupId
-                }
-            }
-        });
+        const isPlatformAdmin = user.role === "PLATFORM_ADMIN";
 
-        if (!membership || membership.role !== "ADMIN") {
-            return new NextResponse("Forbidden", { status: 403 });
+        if (!isPlatformAdmin) {
+            const membership = await prisma.membership.findUnique({
+                where: {
+                    userId_groupId: {
+                        userId: user.id,
+                        groupId: ride.groupId
+                    }
+                }
+            });
+
+            if (!membership || membership.role !== "ADMIN") {
+                return new NextResponse("Forbidden", { status: 403 });
+            }
         }
 
         await prisma.ride.delete({

@@ -216,7 +216,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                 Members ({group.memberships?.filter(m => m.status === "APPROVED").length || 0})
                                 {activeTab === "members" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>}
                             </button>
-                            {group.isAdmin && (
+                            {(group.isAdmin) && (
                                 <button
                                     onClick={() => setActiveTab("requests")}
                                     className={`pb-4 text-sm font-semibold transition-all relative ${activeTab === "requests" ? "text-orange-500" : "text-zinc-500 hover:text-zinc-300"
@@ -288,10 +288,10 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                                         </div>
                                                     )}
                                                 </div>
-                                                <div>
+                                                <Link href={`/profile/${member.userId}`} className="hover:underline">
                                                     <p className="text-sm font-bold">{member.user.name}</p>
                                                     <p className="text-xs text-zinc-500">{member.role === "ADMIN" ? "Organizer" : "Member"}</p>
-                                                </div>
+                                                </Link>
                                             </div>
                                             <div className="flex gap-2">
                                                 {member.user.ridingExperience && (

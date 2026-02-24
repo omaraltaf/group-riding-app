@@ -337,10 +337,10 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                                         <div className="h-10 w-10 rounded-full bg-zinc-800 flex items-center justify-center">
                                             <Users className="h-5 w-5 text-zinc-600" />
                                         </div>
-                                        <div>
+                                        <Link href={`/profile/${rsvp.user.id}`} className="hover:underline">
                                             <p className="text-sm font-bold">{rsvp.user.name}</p>
                                             <p className="text-xs text-zinc-500">{rsvp.user.bikeTypes || "Motorcycle"}</p>
-                                        </div>
+                                        </Link>
                                     </div>
                                 ))}
                             </div>

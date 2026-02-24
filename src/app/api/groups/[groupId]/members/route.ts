@@ -59,17 +59,21 @@ export async function PATCH(
         const user = await getCurrentUser();
         if (!user) return new NextResponse("Unauthorized", { status: 401 });
 
-        const myMembership = await prisma.membership.findUnique({
-            where: {
-                userId_groupId: {
-                    userId: user.id,
-                    groupId: groupId,
-                },
-            },
-        });
+        const isPlatformAdmin = user.role === "PLATFORM_ADMIN";
 
-        if (!myMembership || myMembership.role !== "ADMIN") {
-            return new NextResponse("Forbidden", { status: 403 });
+        if (!isPlatformAdmin) {
+            const myMembership = await prisma.membership.findUnique({
+                where: {
+                    userId_groupId: {
+                        userId: user.id,
+                        groupId: groupId,
+                    },
+                },
+            });
+
+            if (!myMembership || myMembership.role !== "ADMIN") {
+                return new NextResponse("Forbidden", { status: 403 });
+            }
         }
 
         const body = await req.json();
@@ -104,20 +108,24 @@ export async function DELETE(
         const url = new URL(req.url);
         const targetUserId = url.searchParams.get("userId") || user.id;
 
-        const myMembership = await prisma.membership.findUnique({
-            where: {
-                userId_groupId: {
-                    userId: user.id,
-                    groupId: groupId,
+        const isPlatformAdmin = user.role === "PLATFORM_ADMIN";
+
+        if (!isPlatformAdmin) {
+            const myMembership = await prisma.membership.findUnique({
+                where: {
+                    userId_groupId: {
+                        userId: user.id,
+                        groupId: groupId,
+                    },
                 },
-            },
-        });
+            });
 
-        if (!myMembership) return new NextResponse("Forbidden", { status: 403 });
+            if (!myMembership) return new NextResponse("Forbidden", { status: 403 });
 
-        // Can only delete yourself, unless you are an admin deleting someone else
-        if (targetUserId !== user.id && myMembership.role !== "ADMIN") {
-            return new NextResponse("Forbidden", { status: 403 });
+            // Can only delete yourself, unless you are an admin deleting someone else
+            if (targetUserId !== user.id && myMembership.role !== "ADMIN") {
+                return new NextResponse("Forbidden", { status: 403 });
+            }
         }
 
         await prisma.membership.delete({
