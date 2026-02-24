@@ -117,24 +117,56 @@ export async function PATCH(
             meetingPointUrl,
         } = body;
 
+        const rideStartTime = startTime ? new Date(startTime) : null;
+        if (rideStartTime && rideStartTime.toString() === "Invalid Date") {
+            return new NextResponse("Invalid start time", { status: 400 });
+        }
+
+        const parsedRiderCap = riderCap ? parseInt(riderCap) : null;
+        if (riderCap && isNaN(parsedRiderCap as number)) {
+            return new NextResponse("Invalid rider capacity", { status: 400 });
+        }
+
         const updatedRide = await prisma.ride.update({
             where: { id: rideId },
             data: {
-                title,
-                description,
-                startTime: startTime ? new Date(startTime) : undefined,
-                meetingPoint,
+                title: title === "" ? undefined : title,
+                description: description === "" ? undefined : description,
+                startTime: rideStartTime || undefined,
+                meetingPoint: meetingPoint === "" ? undefined : meetingPoint,
                 itinerary,
                 terrainDifficulty,
                 suitableBikes,
-                riderCap: riderCap ? parseInt(riderCap) : undefined,
+                riderCap: (riderCap && !isNaN(parsedRiderCap as number)) ? parsedRiderCap : undefined,
                 isPublic: isPublic !== undefined ? !!isPublic : undefined,
                 status: status || undefined,
-                destination,
+                destination: destination === "" ? undefined : destination,
                 destinationUrl,
                 meetingPointUrl,
             },
         });
+
+        // NOTIFICATION: Notify all RSVP'd riders about the update
+        const participants = await prisma.rSVP.findMany({
+            where: {
+                rideId: rideId,
+                status: { in: ["CONFIRMED", "INTERESTED"] },
+                userId: { not: user.id }, // Don't notify the person making the update
+            },
+            select: { userId: true },
+        });
+
+        if (participants.length > 0) {
+            await prisma.notification.createMany({
+                data: participants.map((p) => ({
+                    userId: p.userId,
+                    type: "RIDE_UPDATE",
+                    title: "Ride Updated",
+                    message: `Important: Details for the ride "${updatedRide.title}" have been updated.`,
+                    relatedId: rideId,
+                })),
+            });
+        }
 
         return NextResponse.json(updatedRide);
     } catch (error) {
@@ -154,6 +186,12 @@ export async function DELETE(
 
         const ride = await prisma.ride.findUnique({
             where: { id: rideId },
+            include: {
+                rsvps: {
+                    where: { status: { in: ["CONFIRMED", "INTERESTED"] } },
+                    select: { userId: true }
+                }
+            }
         });
 
         if (!ride) return new NextResponse("Ride not found", { status: 404 });
@@ -172,6 +210,22 @@ export async function DELETE(
 
             if (!membership || membership.role !== "ADMIN") {
                 return new NextResponse("Forbidden", { status: 403 });
+            }
+        }
+
+        // NOTIFICATION: Notify all RSVP'd riders about the cancellation BEFORE deleting
+        if (ride.rsvps.length > 0) {
+            const participantsToNotify = ride.rsvps.filter(r => r.userId !== user.id);
+            if (participantsToNotify.length > 0) {
+                await prisma.notification.createMany({
+                    data: participantsToNotify.map((p) => ({
+                        userId: p.userId,
+                        type: "RIDE_CANCEL",
+                        title: "Ride Cancelled",
+                        message: `The ride "${ride.title}" has been cancelled.`,
+                        relatedId: ride.groupId, // Link back to group since ride is gone
+                    })),
+                });
             }
         }
 

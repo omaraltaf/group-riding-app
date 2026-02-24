@@ -43,6 +43,29 @@ export async function POST(
             },
         });
 
+        // NOTIFICATION: Notify group admin of a new join request OR notify user they joined
+        if (status === "PENDING") {
+            await prisma.notification.create({
+                data: {
+                    userId: group.creatorId,
+                    type: "JOIN_REQUEST",
+                    title: "New Join Request",
+                    message: `${user.name} wants to join "${group.name}".`,
+                    relatedId: groupId,
+                },
+            });
+        } else {
+            await prisma.notification.create({
+                data: {
+                    userId: user.id,
+                    type: "GROUP_JOIN",
+                    title: "Welcome to the Group!",
+                    message: `You have successfully joined "${group.name}".`,
+                    relatedId: groupId,
+                },
+            });
+        }
+
         return NextResponse.json(membership);
     } catch (error) {
         console.error("GROUP_JOIN_ERROR", error);
@@ -87,7 +110,34 @@ export async function PATCH(
                 },
             },
             data: { status, role },
+            include: {
+                group: true,
+                user: true,
+            }
         });
+
+        // NOTIFICATION: Notify user of status update (Approved/Rejected)
+        if (status === "APPROVED") {
+            await prisma.notification.create({
+                data: {
+                    userId: userId,
+                    type: "GROUP_JOIN",
+                    title: "Join Request Approved",
+                    message: `You are now a member of ${updatedMembership.group.name}!`,
+                    relatedId: groupId,
+                },
+            });
+        } else if (status === "REJECTED") {
+            await prisma.notification.create({
+                data: {
+                    userId: userId,
+                    type: "JOIN_REJECT",
+                    title: "Join Request Status",
+                    message: `Your request to join ${updatedMembership.group.name} was not approved.`,
+                    relatedId: groupId,
+                },
+            });
+        }
 
         return NextResponse.json(updatedMembership);
     } catch (error) {

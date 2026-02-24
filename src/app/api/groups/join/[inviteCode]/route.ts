@@ -46,6 +46,19 @@ export async function POST(
             },
         });
 
+        // NOTIFICATION: Notify user they joined
+        if (status === "APPROVED") {
+            await prisma.notification.create({
+                data: {
+                    userId: user.id,
+                    type: "GROUP_JOIN",
+                    title: "Welcome to the Group!",
+                    message: `You have successfully joined "${group.name}" via invite code.`,
+                    relatedId: group.id,
+                },
+            });
+        }
+
         return NextResponse.json({ groupId: group.id, status });
     } catch (error) {
         console.error("INVITE_JOIN_ERROR", error);

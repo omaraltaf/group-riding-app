@@ -52,6 +52,19 @@ export async function POST(
             },
         });
 
+        // NOTIFICATION: Notify the ride creator if it's confirmed or interested
+        if ((status === "CONFIRMED" || status === "INTERESTED") && ride.creatorId !== user.id) {
+            await prisma.notification.create({
+                data: {
+                    userId: ride.creatorId,
+                    type: "RIDE_UPDATE",
+                    title: "New RSVP!",
+                    message: `${user.name} is ${status.toLowerCase()} for your ride "${ride.title}".`,
+                    relatedId: rideId,
+                },
+            });
+        }
+
         return NextResponse.json(rsvp);
     } catch (error) {
         console.error("RSVP_POST_ERROR", error);

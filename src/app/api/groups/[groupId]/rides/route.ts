@@ -47,25 +47,63 @@ export async function POST(
             meetingPointUrl,
         } = body;
 
+        const rideStartTime = startTime ? new Date(startTime) : new Date();
+        const rideEndTime = endTime ? new Date(endTime) : null;
+
+        // Basic validation to prevent 500 errors
+        if (rideStartTime.toString() === "Invalid Date") {
+            return new NextResponse("Invalid start time", { status: 400 });
+        }
+
+        const parsedRiderCap = riderCap ? parseInt(riderCap) : null;
+        if (riderCap && isNaN(parsedRiderCap as number)) {
+            return new NextResponse("Invalid rider capacity", { status: 400 });
+        }
+
         const ride = await prisma.ride.create({
             data: {
-                title,
-                description,
-                startTime: new Date(startTime),
-                endTime: endTime ? new Date(endTime) : null,
-                meetingPoint,
-                itinerary,
-                terrainDifficulty,
-                suitableBikes,
-                riderCap: riderCap ? parseInt(riderCap) : null,
+                title: title || "New Ride",
+                description: description || "",
+                startTime: rideStartTime,
+                endTime: rideEndTime,
+                meetingPoint: meetingPoint || "",
+                itinerary: itinerary || "",
+                terrainDifficulty: terrainDifficulty || "Medium",
+                suitableBikes: suitableBikes || "",
+                riderCap: (riderCap && !isNaN(parsedRiderCap as number)) ? parsedRiderCap : null,
                 isPublic: !!isPublic,
                 groupId: groupId,
                 creatorId: user.id,
-                destination,
-                destinationUrl,
-                meetingPointUrl,
+                destination: destination || "",
+                destinationUrl: destinationUrl || "",
+                meetingPointUrl: meetingPointUrl || "",
             },
+            include: {
+                group: true,
+            }
         });
+
+        // NOTIFICATION: Notify all group members about the new ride
+        const members = await prisma.membership.findMany({
+            where: {
+                groupId: groupId,
+                status: "APPROVED",
+                userId: { not: user.id }, // Don't notify the creator
+            },
+            select: { userId: true },
+        });
+
+        if (members.length > 0) {
+            await prisma.notification.createMany({
+                data: members.map((m) => ({
+                    userId: m.userId,
+                    type: "RIDE_NEW",
+                    title: "New Ride Scheduled!",
+                    message: `${user.name} posted a new ride: "${title}" in "${ride.group.name}".`,
+                    relatedId: ride.id,
+                })),
+            });
+        }
 
         return NextResponse.json(ride);
     } catch (error) {

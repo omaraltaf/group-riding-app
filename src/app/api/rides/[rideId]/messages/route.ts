@@ -33,9 +33,32 @@ export async function POST(
             include: {
                 user: {
                     select: { id: true, name: true, image: true }
-                }
+                },
+                ride: true,
             }
         });
+
+        // NOTIFICATION: Notify all other RSVP'd participants about the new message
+        const participants = await prisma.rSVP.findMany({
+            where: {
+                rideId: rideId,
+                status: { in: ["CONFIRMED", "INTERESTED"] },
+                userId: { not: user.id }, // Don't notify the sender
+            },
+            select: { userId: true },
+        });
+
+        if (participants.length > 0) {
+            await prisma.notification.createMany({
+                data: participants.map((p) => ({
+                    userId: p.userId,
+                    type: "MESSAGE",
+                    title: `New Message in ${message.ride.title}`,
+                    message: `${user.name}: ${content.substring(0, 50)}${content.length > 50 ? "..." : ""}`,
+                    relatedId: rideId,
+                })),
+            });
+        }
 
         return NextResponse.json(message);
     } catch (error) {
