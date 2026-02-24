@@ -8,7 +8,8 @@ import {
     Calendar,
     Users,
     AlertCircle,
-    Info
+    Info,
+    Shield
 } from "lucide-react";
 import Link from "next/link";
 
@@ -64,6 +65,7 @@ export default function NotificationsPage() {
                 return <Users className="h-5 w-5 text-blue-500" />;
             case "JOIN_REQUEST": return <AlertCircle className="h-5 w-5 text-yellow-500" />;
             case "MESSAGE": return <Info className="h-5 w-5 text-zinc-500" />;
+            case "GROUP_CREATE_REQUEST": return <Shield className="h-5 w-5 text-orange-500" />;
             default: return <Info className="h-5 w-5 text-zinc-500" />;
         }
     };
@@ -75,6 +77,7 @@ export default function NotificationsPage() {
             case "JOIN_REQUEST":
             case "GROUP_JOIN":
             case "JOIN_REJECT":
+            case "GROUP_CREATE_REQUEST":
                 return `/groups/${relatedId}`;
             case "RIDE_UPDATE":
             case "RIDE_NEW":

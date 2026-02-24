@@ -52,8 +52,10 @@ interface Group {
     joinPolicy: string;
     inviteCode: string;
     isAdmin: boolean;
+    isPlatformAdmin: boolean;
     isMember: boolean;
     myStatus: string;
+    status: string;
     memberships: Member[];
     rides: Ride[];
     _count: {
@@ -70,6 +72,9 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
     const [activeTab, setActiveTab] = useState("rides");
     const [copied, setCopied] = useState(false);
     const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+    const [showApprovalConfirm, setShowApprovalConfirm] = useState(false);
+    const [pendingStatus, setPendingStatus] = useState<string | null>(null);
+    const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
     useEffect(() => {
         fetch(`/api/groups/${groupId}`)
@@ -80,6 +85,32 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
             })
             .catch(err => console.error(err));
     }, [groupId]);
+
+    const handleGroupApproval = async (status: string) => {
+        setPendingStatus(status);
+        setShowApprovalConfirm(true);
+    };
+
+    const confirmGroupApproval = async () => {
+        if (!pendingStatus) return;
+
+        setIsUpdatingStatus(true);
+        try {
+            const res = await fetch(`/api/groups/${groupId}`, {
+                method: "PATCH",
+                body: JSON.stringify({ status: pendingStatus }),
+                headers: { "Content-Type": "application/json" },
+            });
+            if (res.ok) {
+                window.location.reload();
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsUpdatingStatus(false);
+            setShowApprovalConfirm(false);
+        }
+    };
 
     const handleJoin = async () => {
         try {
@@ -203,6 +234,47 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                     <h3 className="font-bold">Request Pending</h3>
                                     <p className="text-zinc-500 text-sm">An admin will review your request shortly.</p>
                                 </div>
+                            </div>
+                        )}
+
+                        {group.status === "PENDING" && (
+                            <div className="p-6 bg-orange-600/10 rounded-2xl ring-1 ring-orange-500/20 flex items-center justify-between gap-4 border-l-4 border-orange-500 shadow-xl shadow-orange-950/10">
+                                <div className="flex items-center gap-4">
+                                    <div className="h-10 w-10 bg-orange-500/20 rounded-full flex items-center justify-center">
+                                        <Shield className="h-5 w-5 text-orange-500" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-orange-500">Group Pending Approval</h3>
+                                        <p className="text-zinc-400 text-sm">This group is currently pending approval from platform admins. it is only visible to you and admins.</p>
+                                    </div>
+                                </div>
+
+                                {group.isPlatformAdmin && (
+                                    <div className="flex gap-2 shrink-0">
+                                        <button
+                                            disabled={isUpdatingStatus}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                handleGroupApproval("REJECTED");
+                                            }}
+                                            className="px-4 py-2 rounded-xl bg-zinc-800 text-zinc-400 font-bold hover:bg-red-500/10 hover:text-red-500 transition-all ring-1 ring-zinc-700 disabled:opacity-50"
+                                        >
+                                            Reject
+                                        </button>
+                                        <button
+                                            disabled={isUpdatingStatus}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                handleGroupApproval("APPROVED");
+                                            }}
+                                            className="px-6 py-2 rounded-xl bg-orange-600 text-white font-bold hover:bg-orange-500 transition-all shadow-lg active:scale-95 disabled:opacity-50"
+                                        >
+                                            Approve Group
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         )}
 
@@ -428,6 +500,44 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                             <button
                                 onClick={() => setShowLeaveConfirm(false)}
                                 className="w-full py-4 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-2xl transition-all active:scale-[0.98]"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showApprovalConfirm && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className={`h-16 w-16 ${pendingStatus === "APPROVED" ? "bg-emerald-500/10" : "bg-red-500/10"} rounded-2xl flex items-center justify-center mb-6`}>
+                            {pendingStatus === "APPROVED" ? (
+                                <Check className={`h-8 w-8 text-emerald-500`} />
+                            ) : (
+                                <X className={`h-8 w-8 text-red-500`} />
+                            )}
+                        </div>
+                        <h2 className="text-2xl font-bold text-white mb-2">
+                            {pendingStatus === "APPROVED" ? "Approve Group?" : "Reject Group?"}
+                        </h2>
+                        <p className="text-zinc-400 mb-8">
+                            {pendingStatus === "APPROVED"
+                                ? `Are you sure you want to approve "${group.name}"? It will become visible in discovery.`
+                                : `Are you sure you want to reject "${group.name}"? The creator will be notified.`}
+                        </p>
+                        <div className="flex flex-col gap-3">
+                            <button
+                                onClick={confirmGroupApproval}
+                                disabled={isUpdatingStatus}
+                                className={`w-full py-4 ${pendingStatus === "APPROVED" ? "bg-orange-600 hover:bg-orange-500" : "bg-red-600 hover:bg-red-500"} text-white font-bold rounded-2xl transition-all active:scale-[0.98] disabled:opacity-50`}
+                            >
+                                {isUpdatingStatus ? "Processing..." : (pendingStatus === "APPROVED" ? "Yes, Approve Group" : "Yes, Reject Group")}
+                            </button>
+                            <button
+                                onClick={() => setShowApprovalConfirm(false)}
+                                disabled={isUpdatingStatus}
+                                className="w-full py-4 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-2xl transition-all active:scale-[0.98] disabled:opacity-50"
                             >
                                 Cancel
                             </button>

@@ -27,6 +27,7 @@ export async function POST(req: Request) {
                 name,
                 description,
                 joinPolicy: joinPolicy || "REQUEST_ONLY",
+                status: "PENDING",
                 inviteCode,
                 creatorId: user.id,
                 memberships: {
@@ -41,6 +42,24 @@ export async function POST(req: Request) {
                 memberships: true,
             },
         });
+
+        // NOTIFICATION: Notify all PLATFORM_ADMINs about the new group creation request
+        const platformAdmins = await prisma.user.findMany({
+            where: { role: "PLATFORM_ADMIN" },
+            select: { id: true }
+        });
+
+        if (platformAdmins.length > 0) {
+            await prisma.notification.createMany({
+                data: platformAdmins.map(admin => ({
+                    userId: admin.id,
+                    type: "GROUP_CREATE_REQUEST",
+                    title: "New Group Approval Required",
+                    message: `A new group "${name}" has been created and requires your approval.`,
+                    relatedId: group.id
+                }))
+            });
+        }
 
         return NextResponse.json(group);
     } catch (error) {

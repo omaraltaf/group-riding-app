@@ -14,6 +14,7 @@ export async function GET(req: Request) {
 
         const groups = await prisma.group.findMany({
             where: {
+                status: "APPROVED",
                 OR: [
                     { name: { contains: query, mode: "insensitive" } },
                     { description: { contains: query, mode: "insensitive" } },

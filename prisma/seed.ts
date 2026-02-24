@@ -62,6 +62,7 @@ async function main() {
                     name: groupData[i].name,
                     description: groupData[i].description,
                     joinPolicy: groupData[i].joinPolicy,
+                    status: "APPROVED",
                     inviteCode: `JOIN-${groupData[i].name.replace(/\s+/g, '-').toUpperCase()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
                     creatorId: users[i].id,
                 }
