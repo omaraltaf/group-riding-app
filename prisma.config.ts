@@ -5,30 +5,34 @@ const getDatabaseUrl = () => {
     let url = process.env.DIRECT_URL || process.env.DATABASE_URL;
     if (!url) return undefined;
 
-    // If we're performing a migration and it's a Neon pooled URL,
-    // automatically derive the direct URL and clean up host.
+    // 1. Derivation: Handle Neon pooled URLs
     if (!process.env.DIRECT_URL && url.includes("-pooler")) {
         url = url.replace("-pooler", "");
     }
 
-    // WORKAROUND: Force pgbouncer=true to skip advisory locks during migration.
-    // This resolves the P1002 timeout even on direct connections if the DB is under load
-    // or has stale locks.
-    const separator = url.includes("?") ? "&" : "?";
-    if (!url.includes("pgbouncer=")) {
-        url += `${separator}pgbouncer=true`;
-    } else if (url.includes("pgbouncer=false")) {
-        url = url.replace("pgbouncer=false", "pgbouncer=true");
-    }
+    // 2. Aggressive Locking Bypass: Use pgbouncer=true to skip advisory locks.
+    // 3. Robust Parameter Handling: Use URL split/join for safety.
+    try {
+        const [base, params] = url.split("?");
+        const searchParams = new URLSearchParams(params || "");
 
-    // Add a generous timeout for the initial connection
-    if (!url.includes("connect_timeout=")) {
-        const nextSeparator = url.includes("?") ? "&" : "?";
-        url += `${nextSeparator}connect_timeout=30`;
-    }
+        searchParams.set("pgbouncer", "true");
+        searchParams.set("connect_timeout", "60");
+        searchParams.set("pool_timeout", "60");
 
-    return url;
+        return `${base}?${searchParams.toString()}`;
+    } catch (e) {
+        console.warn("Failed to parse database URL for parameters, using raw URL.");
+        return url;
+    }
 };
+
+const finalUrl = getDatabaseUrl();
+
+// Side-effect: Ensure the environment variable is updated for the migration engine.
+if (finalUrl) {
+    process.env.DATABASE_URL = finalUrl;
+}
 
 export default defineConfig({
     schema: "prisma/schema.prisma",
@@ -37,6 +41,6 @@ export default defineConfig({
         seed: "npx tsx prisma/seed.ts",
     },
     datasource: {
-        url: getDatabaseUrl(),
+        url: finalUrl,
     },
 });
