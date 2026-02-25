@@ -55,6 +55,9 @@ model Membership {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, groupId])
+  @@index([userId])
+  @@index([groupId])
+  @@index([status])
 }
 
 model Ride {
@@ -81,6 +84,12 @@ model Ride {
   messages          Message[]
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+
+  @@index([groupId])
+  @@index([creatorId])
+  @@index([startTime])
+  @@index([isPublic])
+  @@index([status])
 }
 
 model RSVP {
@@ -105,6 +114,10 @@ model Message {
   ride      Ride     @relation(fields: [rideId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([rideId])
+  @@index([createdAt])
 }
 
 model Notification {
@@ -118,4 +131,8 @@ model Notification {
   relatedId String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
 }
