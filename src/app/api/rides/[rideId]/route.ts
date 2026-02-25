@@ -229,9 +229,16 @@ export async function DELETE(
             }
         }
 
-        await prisma.ride.delete({
-            where: { id: rideId },
-        });
+        await prisma.$transaction([
+            // Clear notifications for this ride
+            prisma.notification.deleteMany({
+                where: { relatedId: rideId }
+            }),
+            // Delete the ride (cascades will handle RSVPs and messages)
+            prisma.ride.delete({
+                where: { id: rideId },
+            }),
+        ]);
 
         return new NextResponse(null, { status: 204 });
     } catch (error) {

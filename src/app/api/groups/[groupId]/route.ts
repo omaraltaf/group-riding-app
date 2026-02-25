@@ -162,7 +162,7 @@ export async function DELETE(
             }
         }
 
-        // Manual cascade delete because Prisma schema doesn't have onDelete: Cascade
+        // Get ride IDs for notification cleanup
         const rides = await prisma.ride.findMany({
             where: { groupId },
             select: { id: true },
@@ -170,23 +170,16 @@ export async function DELETE(
         const rideIds = rides.map((r: any) => r.id);
 
         await prisma.$transaction([
-            // Delete RSVPs for all rides in this group
-            prisma.rSVP.deleteMany({
-                where: { rideId: { in: rideIds } },
+            // Delete notifications related to this group or its rides
+            prisma.notification.deleteMany({
+                where: {
+                    OR: [
+                        { relatedId: groupId },
+                        { relatedId: { in: rideIds } }
+                    ]
+                }
             }),
-            // Delete Messages for all rides in this group
-            prisma.message.deleteMany({
-                where: { rideId: { in: rideIds } },
-            }),
-            // Delete all rides in this group
-            prisma.ride.deleteMany({
-                where: { groupId },
-            }),
-            // Delete all memberships in this group
-            prisma.membership.deleteMany({
-                where: { groupId },
-            }),
-            // Finally delete the group
+            // Use database-level cascade delete for everything else
             prisma.group.delete({
                 where: { id: groupId },
             }),
