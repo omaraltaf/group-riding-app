@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate && prisma migrate deploy"
+    "postinstall": "prisma generate && node prisma/migrate.js"
   },
   "dependencies": {
     "@libsql/client": "^0.17.0",
