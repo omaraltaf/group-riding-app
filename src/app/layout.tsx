@@ -35,6 +35,7 @@ export const metadata: Metadata = {
 
 import { Providers } from "@/components/providers";
 import Navbar from "@/components/navbar";
+import { Suspense } from "react";
 
 export default function RootLayout({
   children,
@@ -47,7 +48,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <Navbar />
+          <Suspense fallback={<div className="h-16 bg-zinc-950 border-b border-zinc-800 antialiased animate-pulse" />}>
+            <Navbar />
+          </Suspense>
           {children}
         </Providers>
       </body>
