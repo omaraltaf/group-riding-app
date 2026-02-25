@@ -78,12 +78,20 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
 
     useEffect(() => {
         fetch(`/api/groups/${groupId}`)
-            .then(res => res.json())
-            .then(data => {
+            .then(async res => {
+                if (res.status === 401) {
+                    window.location.href = "/login";
+                    return;
+                }
+                if (!res.ok) throw new Error("Failed to fetch group");
+                const data = await res.json();
                 setGroup(data);
                 setLoading(false);
             })
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error(err);
+                setLoading(false);
+            });
     }, [groupId]);
 
     const handleGroupApproval = async (status: string) => {

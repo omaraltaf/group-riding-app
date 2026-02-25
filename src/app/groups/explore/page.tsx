@@ -25,8 +25,13 @@ export default function ExploreGroupsPage() {
         const fetchGroups = async () => {
             try {
                 const res = await fetch(`/api/groups/discovery${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ""}`);
+                if (res.status === 401) {
+                    window.location.href = "/login";
+                    return;
+                }
+                if (!res.ok) throw new Error("Failed to fetch groups");
                 const data = await res.json();
-                setGroups(data);
+                setGroups(Array.isArray(data) ? data : []);
             } catch (err) {
                 console.error(err);
             } finally {

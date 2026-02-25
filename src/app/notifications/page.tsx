@@ -29,12 +29,20 @@ export default function NotificationsPage() {
 
     useEffect(() => {
         fetch("/api/notifications")
-            .then(res => res.json())
-            .then(data => {
-                setNotifications(data);
+            .then(async res => {
+                if (res.status === 401) {
+                    window.location.href = "/login";
+                    return;
+                }
+                if (!res.ok) throw new Error("Failed to fetch notifications");
+                const data = await res.json();
+                setNotifications(Array.isArray(data) ? data : []);
                 setLoading(false);
             })
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error(err);
+                setLoading(false);
+            });
     }, []);
 
     const markAsRead = async (id: string) => {

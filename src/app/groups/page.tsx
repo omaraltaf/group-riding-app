@@ -20,12 +20,20 @@ export default function GroupsPage() {
 
     useEffect(() => {
         fetch("/api/groups")
-            .then(res => res.json())
-            .then(data => {
-                setGroups(data);
+            .then(async res => {
+                if (res.status === 401) {
+                    window.location.href = "/login";
+                    return;
+                }
+                if (!res.ok) throw new Error("Failed to fetch groups");
+                const data = await res.json();
+                setGroups(Array.isArray(data) ? data : []);
                 setLoading(false);
             })
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error(err);
+                setLoading(false);
+            });
     }, []);
 
     if (loading) {

@@ -72,16 +72,28 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
 
     useEffect(() => {
         fetch(`/api/rides/${rideId}`)
-            .then(res => res.json())
-            .then(data => {
+            .then(async res => {
+                if (res.status === 401) {
+                    window.location.href = "/login";
+                    return;
+                }
+                if (!res.ok) throw new Error("Failed to fetch ride");
+                const data = await res.json();
                 setRide(data);
                 setLoading(false);
             })
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error(err);
+                setLoading(false);
+            });
 
         fetch(`/api/rides/${rideId}/messages`)
-            .then(res => res.json())
-            .then(data => setMessages(data))
+            .then(async res => {
+                if (res.status === 401) return;
+                if (!res.ok) throw new Error("Failed to fetch messages");
+                const data = await res.json();
+                setMessages(Array.isArray(data) ? data : []);
+            })
             .catch(err => console.error(err));
     }, [rideId]);
 
