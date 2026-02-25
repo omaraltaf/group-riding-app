@@ -163,7 +163,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
 
     if (!ride) return null;
 
-    const confirmedCount = ride.rsvps.filter(r => r.status === "CONFIRMED").length;
+    const confirmedCount = (ride.rsvps || []).filter(r => r.status === "CONFIRMED").length;
     const isFull = ride.riderCap ? confirmedCount >= ride.riderCap : false;
 
     return (
@@ -293,7 +293,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                                             <p>No messages yet. Start the conversation!</p>
                                         </div>
                                     ) : (
-                                        messages.map((msg) => (
+                                        (messages || []).map((msg) => (
                                             <div key={msg.id} className="flex gap-3">
                                                 <div className="h-8 w-8 rounded-full bg-zinc-800 shrink-0 flex items-center justify-center">
                                                     <Users className="h-4 w-4 text-zinc-600" />
@@ -344,7 +344,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                                 <Users className="h-5 w-5 text-orange-500" /> Attending ({confirmedCount})
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {ride.rsvps.filter(r => r.status === "CONFIRMED").map(rsvp => (
+                                {((ride.rsvps || []).filter(r => r.status === "CONFIRMED")).map(rsvp => (
                                     <div key={rsvp.id} className="p-4 bg-zinc-900 rounded-2xl ring-1 ring-zinc-800 flex items-center gap-3">
                                         <div className="h-10 w-10 rounded-full bg-zinc-800 flex items-center justify-center">
                                             <Users className="h-5 w-5 text-zinc-600" />

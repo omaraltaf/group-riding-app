@@ -145,7 +145,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                     if (!prev) return null;
                     return {
                         ...prev,
-                        memberships: prev.memberships.map(m =>
+                        memberships: (prev.memberships || []).map(m =>
                             m.userId === userId ? { ...m, status } : m
                         )
                     };
@@ -337,7 +337,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                             <p className="text-zinc-500">No rides planned yet.</p>
                                         </div>
                                     ) : (
-                                        group.rides.map((ride: any) => (
+                                        (group.rides || []).map((ride: any) => (
                                             <Link
                                                 key={ride.id}
                                                 href={`/rides/${ride.id}`}
@@ -365,7 +365,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
 
                             {activeTab === "members" && (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {group.memberships.filter(m => m.status === "APPROVED").map(member => (
+                                    {(group.memberships || []).filter(m => m.status === "APPROVED").map(member => (
                                         <div key={member.id} className="p-4 bg-zinc-900 rounded-2xl ring-1 ring-zinc-800 flex items-center justify-between">
                                             <div className="flex items-center gap-3">
                                                 <div className="h-10 w-10 rounded-full bg-zinc-800 flex items-center justify-center relative">
@@ -400,12 +400,12 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
 
                             {activeTab === "requests" && (
                                 <div className="space-y-3">
-                                    {group.memberships.filter(m => m.status === "PENDING").length === 0 ? (
+                                    {(group.memberships || []).filter(m => m.status === "PENDING").length === 0 ? (
                                         <div className="p-12 text-center bg-zinc-900 rounded-3xl ring-1 ring-zinc-800">
                                             <p className="text-zinc-500 font-medium">No pending requests.</p>
                                         </div>
                                     ) : (
-                                        group.memberships.filter(m => m.status === "PENDING").map(member => (
+                                        (group.memberships || []).filter(m => m.status === "PENDING").map(member => (
                                             <div key={member.id} className="p-6 bg-zinc-900 rounded-2xl ring-1 ring-zinc-800 flex items-center justify-between">
                                                 <div className="flex items-center gap-4">
                                                     <div className="h-12 w-12 rounded-full bg-zinc-800 flex items-center justify-center">
