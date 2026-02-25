@@ -35,7 +35,7 @@ export default async function Home() {
   }
 
   // Fetch data for logged in user
-  const [groups, upcomingRides, unreadNotificationsCount] = await Promise.all([
+  const [groups, upcomingRides] = await Promise.all([
     prisma.membership.findMany({
       where: { userId: user.id, status: "APPROVED" },
       include: { group: { include: { _count: { select: { memberships: true, rides: true } } } } },
@@ -53,9 +53,6 @@ export default async function Home() {
       orderBy: { startTime: "asc" },
       take: 3,
     }),
-    prisma.notification.count({
-      where: { userId: user.id, isRead: false }
-    })
   ]);
 
   return (
