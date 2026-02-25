@@ -55,12 +55,19 @@ export default function DiscoveryPage() {
             }
 
             const res = await fetch(`/api/rides/discovery?${params.toString()}`);
+            if (res.status === 401) {
+                window.location.href = "/login";
+                return;
+            }
+            if (!res.ok) throw new Error("Failed to fetch rides");
+
             const data = await res.json();
+            const newRides = Array.isArray(data.rides) ? data.rides : [];
 
             if (isLoadMore) {
-                setRides(prev => [...prev, ...data.rides]);
+                setRides(prev => [...prev, ...newRides]);
             } else {
-                setRides(data.rides);
+                setRides(newRides);
             }
             setNextCursor(data.nextCursor);
         } catch (err) {
