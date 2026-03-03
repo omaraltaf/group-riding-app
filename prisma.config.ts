@@ -5,6 +5,12 @@ const getDatabaseUrl = () => {
     let url = process.env.DIRECT_URL || process.env.DATABASE_URL;
     if (!url) return undefined;
 
+    // Feature branch database switching
+    if (process.env.VERCEL_GIT_COMMIT_REF === 'feature/vehicle-agnostic-v2' ||
+        process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF === 'feature/vehicle-agnostic-v2') {
+        url = url.replace('ep-bold-leaf-aiww3fi8', 'ep-long-leaf-aisgx9c1');
+    }
+
     // If we're performing a migration and it's a Neon pooled URL,
     // automatically derive the direct URL and clean up host.
     if (!process.env.DIRECT_URL && url.includes("-pooler")) {

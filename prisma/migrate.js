@@ -5,6 +5,12 @@ function getDatabaseUrl() {
     let url = process.env.DIRECT_URL || process.env.DATABASE_URL;
     if (!url) return null;
 
+    // Feature branch database switching
+    if (process.env.VERCEL_GIT_COMMIT_REF === 'feature/vehicle-agnostic-v2' ||
+        process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF === 'feature/vehicle-agnostic-v2') {
+        url = url.replace('ep-bold-leaf-aiww3fi8', 'ep-long-leaf-aisgx9c1');
+    }
+
     // 1. Derivation: Handle Neon pooled URLs
     if (!process.env.DIRECT_URL && url.includes("-pooler")) {
         url = url.replace("-pooler", "");
