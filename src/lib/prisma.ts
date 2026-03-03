@@ -16,6 +16,10 @@ if (process.env.VERCEL_GIT_COMMIT_REF === 'feature/vehicle-agnostic-v2' ||
     connectionString = connectionString?.replace(/ep-[^.]+/, 'ep-long-leaf-aisgx9c1');
 }
 
+console.log("[Prisma] Client initializing with host:", connectionString?.split('@')[1]?.split('/')[0] || "unknown");
+
+export { connectionString };
+
 const pool = new pg.Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 
