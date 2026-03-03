@@ -24,13 +24,20 @@ export const authOptions: NextAuthOptions = {
                     throw new Error("Invalid credentials");
                 }
 
+                console.log("[Auth] Attempting login for:", credentials.email);
                 const user = await prisma.user.findUnique({
                     where: {
                         email: credentials.email,
                     },
-                }) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+                }) as any;
 
-                if (!user || !user.password) {
+                if (!user) {
+                    console.log("[Auth] User not found:", credentials.email);
+                    throw new Error("Invalid credentials");
+                }
+
+                if (!user.password) {
+                    console.log("[Auth] User has no password hash:", credentials.email);
                     throw new Error("Invalid credentials");
                 }
 
@@ -40,8 +47,11 @@ export const authOptions: NextAuthOptions = {
                 );
 
                 if (!isPasswordCorrect) {
+                    console.log("[Auth] Password mismatch for:", credentials.email);
                     throw new Error("Invalid credentials");
                 }
+
+                console.log("[Auth] Login successful for:", credentials.email);
 
                 return {
                     id: user.id,
