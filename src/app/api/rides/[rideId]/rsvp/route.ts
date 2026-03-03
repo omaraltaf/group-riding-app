@@ -15,6 +15,15 @@ export async function POST(
 
         const ride = await prisma.ride.findUnique({
             where: { id: rideId },
+            select: {
+                id: true,
+                title: true,
+                creatorId: true,
+                participantCap: true,
+                _count: {
+                    select: { rsvps: { where: { status: "CONFIRMED" } } }
+                }
+            }
         });
 
         if (!ride) return new NextResponse("Ride not found", { status: 404 });
@@ -26,14 +35,11 @@ export async function POST(
             return new NextResponse("Invalid status", { status: 400 });
         }
 
-        // Check if there's a rider cap
-        if (status === "CONFIRMED" && ride.riderCap) {
-            const confirmedCount = await prisma.rSVP.count({
-                where: { rideId: ride.id, status: "CONFIRMED" },
-            });
-
-            if (confirmedCount >= ride.riderCap) {
-                return new NextResponse("Ride is full", { status: 400 });
+        // Check if there's a participant cap
+        if (status === "CONFIRMED" && (ride as any).participantCap) {
+            const confirmedCount = (ride as any)._count.rsvps;
+            if (confirmedCount >= (ride as any).participantCap) {
+                return new NextResponse("Trip is already full", { status: 400 });
             }
         }
 

@@ -10,7 +10,7 @@ import {
     Clock,
     Info,
     Mountain,
-    Bike,
+    Car,
     Users,
     Globe,
     Lock,
@@ -36,8 +36,8 @@ export default function EditRidePage({ params }: { params: Promise<{ rideId: str
         destinationUrl: "",
         itinerary: "",
         terrainDifficulty: "Easy",
-        suitableBikes: "",
-        riderCap: "",
+        suitableVehicles: "",
+        participantCap: "",
         isPublic: false,
     });
 
@@ -59,8 +59,8 @@ export default function EditRidePage({ params }: { params: Promise<{ rideId: str
                     destinationUrl: data.destinationUrl || "",
                     itinerary: data.itinerary || "",
                     terrainDifficulty: data.terrainDifficulty || "Easy",
-                    suitableBikes: data.suitableBikes || "",
-                    riderCap: data.riderCap?.toString() || "",
+                    suitableVehicles: data.suitableVehicles || "",
+                    participantCap: data.participantCap?.toString() || "",
                     isPublic: data.isPublic || false,
                 });
                 setLoading(false);
@@ -249,12 +249,12 @@ export default function EditRidePage({ params }: { params: Promise<{ rideId: str
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-zinc-400 flex items-center gap-2">
-                                    <Users className="h-4 w-4" /> Rider Capacity
+                                    <Users className="h-4 w-4" /> Participant Capacity
                                 </label>
                                 <input
                                     type="number"
-                                    value={formData.riderCap}
-                                    onChange={(e) => setFormData({ ...formData, riderCap: e.target.value })}
+                                    value={formData.participantCap}
+                                    onChange={(e) => setFormData({ ...formData, participantCap: e.target.value })}
                                     className="w-full rounded-2xl bg-zinc-800 border-0 py-4 px-5 text-white ring-1 ring-zinc-700 focus:ring-2 focus:ring-orange-500 transition-all"
                                     placeholder="Unlimited if empty"
                                 />
@@ -263,14 +263,14 @@ export default function EditRidePage({ params }: { params: Promise<{ rideId: str
 
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-zinc-400 flex items-center gap-2">
-                                <Bike className="h-4 w-4" /> Suitable Bike Types
+                                <Car className="h-4 w-4" /> Suitable Vehicle Types
                             </label>
                             <input
                                 type="text"
-                                value={formData.suitableBikes}
-                                onChange={(e) => setFormData({ ...formData, suitableBikes: e.target.value })}
+                                value={formData.suitableVehicles}
+                                onChange={(e) => setFormData({ ...formData, suitableVehicles: e.target.value })}
                                 className="w-full rounded-2xl bg-zinc-800 border-0 py-4 px-5 text-white ring-1 ring-zinc-700 focus:ring-2 focus:ring-orange-500 transition-all"
-                                placeholder="e.g. Adventure, Sport, Any"
+                                placeholder="e.g. Adventure, Sport, SUV, Any"
                             />
                         </div>
                     </section>

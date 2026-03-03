@@ -50,7 +50,7 @@ export default function GroupsPage() {
                 <div className="flex items-center justify-between mb-12">
                     <div>
                         <h1 className="text-4xl font-black mb-2 tracking-tight">My Groups</h1>
-                        <p className="text-zinc-400">Manage your groups and connect with riders.</p>
+                        <p className="text-zinc-400">Manage your groups and connect with participants.</p>
                     </div>
                     <div className="h-12 w-12 bg-zinc-900 rounded-2xl flex items-center justify-center ring-1 ring-zinc-800">
                         <Users className="h-6 w-6 text-zinc-400" />
@@ -80,7 +80,7 @@ export default function GroupsPage() {
                                 <Users className="h-10 w-10 text-zinc-600" />
                             </div>
                             <h2 className="text-2xl font-bold mb-2">No groups yet</h2>
-                            <p className="text-zinc-500 mb-8 max-w-sm mx-auto">Create a group to start organizing rides and connecting with other riders.</p>
+                            <p className="text-zinc-500 mb-8 max-w-sm mx-auto">Create a group to start organizing trips and connecting with other participants.</p>
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                                 <Link
                                     href="/groups/create"
@@ -125,7 +125,7 @@ export default function GroupsPage() {
                                         </div>
                                         <div className="flex items-center gap-2 text-zinc-400 text-sm">
                                             <Clock className="h-4 w-4" />
-                                            <span>{group._count.rides} Rides</span>
+                                            <span>{group._count.rides} Trips</span>
                                         </div>
                                     </div>
 

@@ -25,7 +25,7 @@ export async function GET(
                 rsvps: {
                     include: {
                         user: {
-                            select: { id: true, name: true, image: true, bikeTypes: true, ridingExperience: true }
+                            select: { id: true, name: true, image: true, vehicleTypes: true, vehicleExperience: true }
                         }
                     }
                 },
@@ -53,13 +53,13 @@ export async function GET(
             return new NextResponse("Forbidden", { status: 403 });
         }
 
-        const myRsvp = ride.rsvps.find((r: any) => r.userId === user.id);
+        const myRsvp = (ride as any).rsvps.find((r: any) => r.userId === user.id);
 
         return NextResponse.json({
             ...ride,
             isMember: !!membership,
             isAdmin: isPlatformAdmin || membership?.role === "ADMIN",
-            isCreator: ride.creatorId === user.id,
+            isCreator: (ride as any).creatorId === user.id,
             myRsvp: myRsvp?.status || null,
         });
     } catch (error) {
@@ -105,11 +105,12 @@ export async function PATCH(
             title,
             description,
             startTime,
+            endTime,
             meetingPoint,
             itinerary,
             terrainDifficulty,
-            suitableBikes,
-            riderCap,
+            suitableVehicles,
+            participantCap,
             isPublic,
             status,
             destination,
@@ -122,9 +123,14 @@ export async function PATCH(
             return new NextResponse("Invalid start time", { status: 400 });
         }
 
-        const parsedRiderCap = riderCap ? parseInt(riderCap) : null;
-        if (riderCap && isNaN(parsedRiderCap as number)) {
-            return new NextResponse("Invalid rider capacity", { status: 400 });
+        const rideEndTime = endTime ? new Date(endTime) : null;
+        if (rideEndTime && rideEndTime.toString() === "Invalid Date") {
+            return new NextResponse("Invalid end time", { status: 400 });
+        }
+
+        const parsedParticipantCap = participantCap ? parseInt(participantCap as string) : null;
+        if (participantCap !== undefined && isNaN(parsedParticipantCap as number)) {
+            return new NextResponse("Invalid participant capacity", { status: 400 });
         }
 
         const updatedRide = await prisma.ride.update({
@@ -133,11 +139,12 @@ export async function PATCH(
                 title: title === "" ? undefined : title,
                 description: description === "" ? undefined : description,
                 startTime: rideStartTime || undefined,
+                endTime: rideEndTime || undefined,
                 meetingPoint: meetingPoint === "" ? undefined : meetingPoint,
                 itinerary,
                 terrainDifficulty,
-                suitableBikes,
-                riderCap: (riderCap && !isNaN(parsedRiderCap as number)) ? parsedRiderCap : undefined,
+                suitableVehicles,
+                participantCap: (participantCap !== undefined && !isNaN(parsedParticipantCap as number)) ? parsedParticipantCap : undefined,
                 isPublic: isPublic !== undefined ? !!isPublic : undefined,
                 status: status || undefined,
                 destination: destination === "" ? undefined : destination,

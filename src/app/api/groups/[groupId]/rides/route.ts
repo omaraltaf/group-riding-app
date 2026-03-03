@@ -39,8 +39,8 @@ export async function POST(
             meetingPoint,
             itinerary,
             terrainDifficulty,
-            suitableBikes,
-            riderCap,
+            suitableVehicles,
+            participantCap,
             isPublic,
             destination,
             destinationUrl,
@@ -55,9 +55,9 @@ export async function POST(
             return new NextResponse("Invalid start time", { status: 400 });
         }
 
-        const parsedRiderCap = riderCap ? parseInt(riderCap) : null;
-        if (riderCap && isNaN(parsedRiderCap as number)) {
-            return new NextResponse("Invalid rider capacity", { status: 400 });
+        const parsedParticipantCap = participantCap ? parseInt(participantCap) : null;
+        if (participantCap && isNaN(parsedParticipantCap as number)) {
+            return new NextResponse("Invalid participant capacity", { status: 400 });
         }
 
         const ride = await prisma.ride.create({
@@ -69,8 +69,8 @@ export async function POST(
                 meetingPoint: meetingPoint || "",
                 itinerary: itinerary || "",
                 terrainDifficulty: terrainDifficulty || "Medium",
-                suitableBikes: suitableBikes || "",
-                riderCap: (riderCap && !isNaN(parsedRiderCap as number)) ? parsedRiderCap : null,
+                suitableVehicles: suitableVehicles || "",
+                participantCap: (participantCap && !isNaN(parsedParticipantCap as number)) ? parsedParticipantCap : null,
                 isPublic: !!isPublic,
                 groupId: groupId,
                 creatorId: user.id,
@@ -79,7 +79,7 @@ export async function POST(
                 meetingPointUrl: meetingPointUrl || "",
             },
             include: {
-                group: true,
+                group: { select: { name: true } },
             }
         });
 
@@ -98,8 +98,8 @@ export async function POST(
                 data: members.map((m) => ({
                     userId: m.userId,
                     type: "RIDE_NEW",
-                    title: "New Ride Scheduled!",
-                    message: `${user.name} posted a new ride: "${title}" in "${ride.group.name}".`,
+                    title: "New Trip Scheduled!",
+                    message: `${user.name} posted a new trip: "${title}" in "${(ride as any).group.name}".`,
                     relatedId: ride.id,
                 })),
             });

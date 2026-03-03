@@ -10,7 +10,7 @@ import {
     Clock,
     Info,
     Mountain,
-    Bike,
+    Car,
     Users,
     Globe,
     Lock
@@ -18,7 +18,7 @@ import {
 import Link from "next/link";
 import AddressAutocomplete from "@/components/address-autocomplete";
 
-export default function CreateRidePage({ params }: { params: Promise<{ groupId: string }> }) {
+export default function CreateTripPage({ params }: { params: Promise<{ groupId: string }> }) {
     const { groupId } = use(params);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -32,8 +32,8 @@ export default function CreateRidePage({ params }: { params: Promise<{ groupId: 
         destinationUrl: "",
         itinerary: "",
         terrainDifficulty: "Easy",
-        suitableBikes: "",
-        riderCap: "",
+        suitableVehicles: "",
+        participantCap: "",
         isPublic: false,
     });
 
@@ -66,7 +66,7 @@ export default function CreateRidePage({ params }: { params: Promise<{ groupId: 
                         <ChevronLeft className="h-5 w-5" />
                         <span>Back to Group</span>
                     </Link>
-                    <h1 className="text-xl font-bold">New Ride</h1>
+                    <h1 className="text-xl font-bold">New Trip</h1>
                     <div className="w-20"></div>
                 </div>
             </nav>
@@ -79,7 +79,7 @@ export default function CreateRidePage({ params }: { params: Promise<{ groupId: 
                         </h3>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-400">Ride Title</label>
+                            <label className="text-sm font-medium text-zinc-400">Trip Title</label>
                             <input
                                 required
                                 type="text"
@@ -97,7 +97,7 @@ export default function CreateRidePage({ params }: { params: Promise<{ groupId: 
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 className="w-full rounded-2xl bg-zinc-800 border-0 py-4 px-5 text-white ring-1 ring-zinc-700 focus:ring-2 focus:ring-orange-500 transition-all"
-                                placeholder="What is the plan for this ride?"
+                                placeholder="What is the plan for this trip?"
                             />
                         </div>
                     </section>
@@ -181,12 +181,12 @@ export default function CreateRidePage({ params }: { params: Promise<{ groupId: 
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-zinc-400 flex items-center gap-2">
-                                    <Users className="h-4 w-4" /> Rider Capacity
+                                    <Users className="h-4 w-4" /> Participant Capacity
                                 </label>
                                 <input
                                     type="number"
-                                    value={formData.riderCap}
-                                    onChange={(e) => setFormData({ ...formData, riderCap: e.target.value })}
+                                    value={formData.participantCap}
+                                    onChange={(e) => setFormData({ ...formData, participantCap: e.target.value })}
                                     className="w-full rounded-2xl bg-zinc-800 border-0 py-4 px-5 text-white ring-1 ring-zinc-700 focus:ring-2 focus:ring-orange-500 transition-all"
                                     placeholder="Unlimited if empty"
                                 />
@@ -195,14 +195,14 @@ export default function CreateRidePage({ params }: { params: Promise<{ groupId: 
 
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-zinc-400 flex items-center gap-2">
-                                <Bike className="h-4 w-4" /> Suitable Bike Types
+                                <Car className="h-4 w-4" /> Suitable Vehicle Types
                             </label>
                             <input
                                 type="text"
-                                value={formData.suitableBikes}
-                                onChange={(e) => setFormData({ ...formData, suitableBikes: e.target.value })}
+                                value={formData.suitableVehicles}
+                                onChange={(e) => setFormData({ ...formData, suitableVehicles: e.target.value })}
                                 className="w-full rounded-2xl bg-zinc-800 border-0 py-4 px-5 text-white ring-1 ring-zinc-700 focus:ring-2 focus:ring-orange-500 transition-all"
-                                placeholder="e.g. Adventure, Sport, Any"
+                                placeholder="e.g. Bikes, Cars, SUVs, 4x4s, Any"
                             />
                         </div>
                     </section>
@@ -214,8 +214,8 @@ export default function CreateRidePage({ params }: { params: Promise<{ groupId: 
                                     {formData.isPublic ? <Globe className="h-6 w-6 text-orange-500" /> : <Lock className="h-6 w-6 text-zinc-500" />}
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-white">Public Ride</h3>
-                                    <p className="text-sm text-zinc-500">Visible to riders outside this group.</p>
+                                    <h3 className="font-bold text-white">Public Trip</h3>
+                                    <p className="text-sm text-zinc-500">Visible to participants outside this group.</p>
                                 </div>
                             </div>
                             <button
@@ -242,7 +242,7 @@ export default function CreateRidePage({ params }: { params: Promise<{ groupId: 
                             disabled={loading}
                             className="flex items-center gap-2 rounded-xl bg-orange-600 px-10 py-4 font-semibold text-white shadow-xl hover:bg-orange-500 transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
                         >
-                            <Save className="h-5 w-5" /> {loading ? "Creating..." : "Create Ride"}
+                            <Save className="h-5 w-5" /> {loading ? "Creating..." : "Create Trip"}
                         </button>
                     </div>
                 </form>

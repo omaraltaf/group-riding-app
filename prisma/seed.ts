@@ -37,10 +37,10 @@ async function main() {
                 data: {
                     email: `user${i}@example.com`,
                     password: password,
-                    name: `Rider ${i}`,
-                    role: "RIDER",
-                    ridingExperience: i % 3 === 0 ? "Expert" : (i % 2 === 0 ? "Intermediate" : "Beginner"),
-                    bikeTypes: i % 2 === 0 ? "Road, Gravel" : "Mountain, Hybrid",
+                    name: `Participant ${i}`,
+                    role: "PARTICIPANT",
+                    vehicleExperience: i % 3 === 0 ? "Expert" : (i % 2 === 0 ? "Intermediate" : "Beginner"),
+                    vehicleTypes: i % 2 === 0 ? "Road, Gravel, SUV" : "Mountain, Hybrid, 4x4",
                 }
             });
             users.push(user);
@@ -93,7 +93,7 @@ async function main() {
 
             // Create 3 rides for each group
             console.log(`Creating rides for ${group.name}...`);
-            const rideTypes = ["Morning Spin", "Afternoon Sprint", "Social Cruise"];
+            const rideTypes = ["Morning Trip", "Afternoon Trip", "Social Cruise"];
             for (let k = 0; k < 3; k++) {
                 const startTime = new Date();
                 startTime.setDate(startTime.getDate() + (k + 1));

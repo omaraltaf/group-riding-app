@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { User, Phone, Bike, Trophy, Bell, Save, ChevronLeft } from "lucide-react";
+import { User, Phone, Car, Trophy, Bell, Save, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 
 export default function ProfilePage() {
@@ -13,8 +13,8 @@ export default function ProfilePage() {
     const [formData, setFormData] = useState({
         name: "",
         phone: "",
-        bikeTypes: "",
-        ridingExperience: "",
+        vehicleTypes: "",
+        vehicleExperience: "",
         pushOptIn: false,
         image: "",
     });
@@ -25,16 +25,14 @@ export default function ProfilePage() {
                 const res = await fetch("/api/auth/session");
                 const session = await res.json();
                 if (session?.user) {
-                    // In a real app, we'd fetch the full user record from a profile API
-                    // For now, we'll assume the session has basic info or fetch it
                     const userRes = await fetch("/api/profile/me");
                     if (userRes.ok) {
                         const userData = await userRes.json();
                         setFormData({
                             name: userData.name || "",
                             phone: userData.phone || "",
-                            bikeTypes: userData.bikeTypes || "",
-                            ridingExperience: userData.ridingExperience || "Beginner",
+                            vehicleTypes: userData.vehicleTypes || "",
+                            vehicleExperience: userData.vehicleExperience || "Beginner",
                             pushOptIn: userData.pushOptIn || false,
                             image: userData.image || "",
                         });
@@ -138,19 +136,19 @@ export default function ProfilePage() {
 
                     <section className="bg-zinc-900 rounded-2xl p-8 ring-1 ring-zinc-800">
                         <h3 className="text-lg font-semibold mb-6 flex items-center gap-2 text-zinc-400">
-                            <Bike className="h-5 w-5" /> Riding Profile
+                            <Car className="h-5 w-5" /> Vehicle Profile
                         </h3>
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-zinc-400">My Bikes</label>
+                                <label className="text-sm font-medium text-zinc-400">My Vehicles</label>
                                 <input
                                     type="text"
-                                    value={formData.bikeTypes}
-                                    onChange={(e) => setFormData({ ...formData, bikeTypes: e.target.value })}
+                                    value={formData.vehicleTypes}
+                                    onChange={(e) => setFormData({ ...formData, vehicleTypes: e.target.value })}
                                     className="w-full rounded-xl bg-zinc-800 border-0 py-3 px-4 text-white ring-1 ring-zinc-700 focus:ring-2 focus:ring-orange-500"
-                                    placeholder="e.g. BMW R1250GS, Ducati Panigale"
+                                    placeholder="e.g. BMW R1250GS, Tesla Model 3"
                                 />
-                                <p className="text-xs text-zinc-500">List your current motorcycles separated by commas.</p>
+                                <p className="text-xs text-zinc-500">List your current vehicles separated by commas.</p>
                             </div>
 
                             <div className="space-y-2">
@@ -158,14 +156,14 @@ export default function ProfilePage() {
                                     <Trophy className="h-4 w-4" /> Experience Level
                                 </label>
                                 <select
-                                    value={formData.ridingExperience}
-                                    onChange={(e) => setFormData({ ...formData, ridingExperience: e.target.value })}
+                                    value={formData.vehicleExperience}
+                                    onChange={(e) => setFormData({ ...formData, vehicleExperience: e.target.value })}
                                     className="w-full rounded-xl bg-zinc-800 border-0 py-3 px-4 text-white ring-1 ring-zinc-700 focus:ring-2 focus:ring-orange-500 appearance-none"
                                 >
                                     <option value="Beginner">Beginner (&lt; 1 year)</option>
                                     <option value="Intermediate">Intermediate (1-3 years)</option>
                                     <option value="Advanced">Advanced (3-7 years)</option>
-                                    <option value="Professional">Professional (7+ years / Track Pro)</option>
+                                    <option value="Professional">Professional (7+ years / Expert)</option>
                                 </select>
                             </div>
                         </div>

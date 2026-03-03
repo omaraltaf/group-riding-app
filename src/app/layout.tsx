@@ -14,14 +14,14 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "TripKarLo",
-  description: "Ride Together, Explore Further with the ultimate group riding platform.",
+  description: "Travel Together, Explore Further with the ultimate group vehicle and travel platform.",
   icons: {
     icon: "/favicon.ico",
     apple: "/favicon.ico",
   },
   openGraph: {
     title: "TripKarLo",
-    description: "Ride Together, Explore Further with the ultimate group riding platform.",
+    description: "Travel Together, Explore Further with the ultimate group vehicle and travel platform.",
     images: [
       {
         url: "/og-image.png",

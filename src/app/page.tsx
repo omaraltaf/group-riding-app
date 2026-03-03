@@ -12,10 +12,10 @@ export default async function Home() {
         <div className="relative isolate px-6 pt-14 lg:px-8">
           <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56 text-center">
             <h1 className="text-5xl font-extrabold tracking-tight sm:text-7xl bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent">
-              Ride Together, Explore Further.
+              Travel Together, Explore Further.
             </h1>
             <p className="mt-8 text-lg font-medium text-zinc-400 sm:text-xl">
-              TripKarLo is the ultimate platform for group riding enthusiasts. Create groups, plan routes, and explore the open road with your community.
+              TripKarLo is the ultimate platform for group vehicle and travel enthusiasts. Create groups, plan routes, and explore the open road with your community.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <Link
@@ -35,7 +35,7 @@ export default async function Home() {
   }
 
   // Fetch data for logged in user
-  const [groups, upcomingRides] = await Promise.all([
+  const [groups, upcomingTrips] = await Promise.all([
     prisma.membership.findMany({
       where: { userId: user.id, status: "APPROVED" },
       include: { group: { include: { _count: { select: { memberships: true, rides: true } } } } },
@@ -60,7 +60,7 @@ export default async function Home() {
       <div className="mx-auto max-w-5xl px-6 pt-12">
         <div className="flex items-center justify-between mb-12">
           <div>
-            <h1 className="text-4xl font-black mb-2 tracking-tight">Welcome back, {user.name?.split(' ')[0] || 'Rider'}!</h1>
+            <h1 className="text-4xl font-black mb-2 tracking-tight">Welcome back, {user.name?.split(' ')[0] || 'Explorer'}!</h1>
             <p className="text-zinc-400">Ready for your next adventure?</p>
           </div>
           <div className="h-12 w-12 bg-zinc-900 rounded-2xl flex items-center justify-center ring-1 ring-zinc-800">
@@ -75,18 +75,18 @@ export default async function Home() {
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-semibold flex items-center gap-2">
                   <Calendar className="text-orange-500 h-5 w-5" />
-                  Upcoming Rides
+                  Upcoming Trips
                 </h3>
-                <Link href="/rides" className="text-sm font-bold text-orange-500 hover:text-orange-400">View all</Link>
+                <Link href="/discovery" className="text-sm font-bold text-orange-500 hover:text-orange-400">Discover More</Link>
               </div>
 
               <div className="grid gap-4">
-                {upcomingRides.length === 0 ? (
+                {upcomingTrips.length === 0 ? (
                   <div className="p-12 text-center bg-zinc-900 rounded-3xl ring-1 ring-zinc-800">
-                    <p className="text-zinc-500">No upcoming rides found. Check back later!</p>
+                    <p className="text-zinc-500">No upcoming trips found. Check back later!</p>
                   </div>
                 ) : (
-                  upcomingRides.map((ride: any) => (
+                  upcomingTrips.map((ride: any) => (
                     <Link
                       key={ride.id}
                       href={`/rides/${ride.id}`}
@@ -107,7 +107,7 @@ export default async function Home() {
                       </div>
                       <div className="mt-6 flex items-center justify-between">
                         <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                          <span className="flex items-center gap-1.5"><UsersIcon className="h-3.5 w-3.5 text-orange-600" /> {ride._count.rsvps} Riders</span>
+                          <span className="flex items-center gap-1.5"><UsersIcon className="h-3.5 w-3.5 text-orange-600" /> {ride._count.rsvps} Participants</span>
                           <span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5 text-orange-600" /> {ride.group.name}</span>
                         </div>
                         <ChevronRight className="h-5 w-5 text-zinc-600 group-hover:text-orange-500 group-hover:translate-x-1 transition-all" />
@@ -141,7 +141,7 @@ export default async function Home() {
                     >
                       <h4 className="font-bold group-hover:text-blue-400 transition-colors uppercase tracking-tight">{membership.group.name}</h4>
                       <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mt-2">
-                        {membership.group._count.memberships} members • {membership.group._count.rides} rides
+                        {membership.group._count.memberships} members • {membership.group._count.rides} trips
                       </p>
                     </Link>
                   ))
@@ -154,7 +154,7 @@ export default async function Home() {
           <div className="space-y-6">
             <div className="rounded-3xl bg-zinc-900 p-8 ring-1 ring-zinc-800 shadow-2xl shadow-black/50">
               <h3 className="text-xl font-black mb-4">Complete Your Profile</h3>
-              <p className="text-sm text-zinc-400 mb-8 leading-relaxed">Add your bike details and experience level to join group rides and connect with other riders.</p>
+              <p className="text-sm text-zinc-400 mb-8 leading-relaxed">Add your vehicle details and experience level to join group trips and connect with other enthusiasts.</p>
               <Link
                 href="/profile"
                 className="block w-full text-center rounded-2xl bg-zinc-800 px-4 py-4 text-sm font-black uppercase tracking-widest hover:bg-zinc-700 transition-all active:scale-95 shadow-lg"
@@ -165,7 +165,7 @@ export default async function Home() {
 
             <div className="rounded-3xl bg-orange-600/5 p-8 ring-1 ring-orange-500/10 border-l-4 border-orange-500 overflow-hidden relative group">
               <div className="absolute top-0 right-0 -mr-8 -mt-8 h-32 w-32 bg-orange-500/10 rounded-full blur-3xl group-hover:bg-orange-500/20 transition-all duration-700"></div>
-              <h3 className="font-black text-orange-500 mb-2 uppercase tracking-tight italic">Safe Riding Guide</h3>
+              <h3 className="font-black text-orange-500 mb-2 uppercase tracking-tight italic">Safe Travel Guide</h3>
               <p className="text-sm text-zinc-400 mb-6 leading-relaxed">Essential tips for group formation, signals, and open road safety.</p>
               <button className="text-xs font-black uppercase tracking-widest text-white bg-zinc-900 px-6 py-3 rounded-xl ring-1 ring-zinc-800 hover:bg-black transition-all shadow-xl active:scale-95">Read Guide</button>
             </div>

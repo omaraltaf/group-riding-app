@@ -19,7 +19,7 @@ export default function NavbarClient({ user, unreadCount }: NavbarClientProps) {
     const navLinks = [
         { href: "/groups", label: "My Groups" },
         { href: "/groups/explore", label: "Explore Groups" },
-        { href: "/rides", label: "Discover Rides" },
+        { href: "/rides", label: "Discover Trips" },
     ];
 
     return (

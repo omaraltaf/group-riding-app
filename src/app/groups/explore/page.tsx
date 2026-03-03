@@ -49,7 +49,7 @@ export default function ExploreGroupsPage() {
                 <div className="flex items-center justify-between mb-12">
                     <div>
                         <h1 className="text-4xl font-black mb-2 tracking-tight">Explore Groups</h1>
-                        <p className="text-zinc-400">Discover and join motorcycle riding communities.</p>
+                        <p className="text-zinc-400">Discover and join vehicle and travel communities.</p>
                     </div>
                     <div className="h-12 w-12 bg-zinc-900 rounded-2xl flex items-center justify-center ring-1 ring-zinc-800">
                         <Users className="h-6 w-6 text-zinc-400" />
@@ -105,7 +105,7 @@ export default function ExploreGroupsPage() {
                                         </div>
                                         <div className="flex items-center gap-2 text-zinc-400 text-sm">
                                             <Clock className="h-4 w-4" />
-                                            <span>{group._count.rides} Rides</span>
+                                            <span>{group._count.rides} Trips</span>
                                         </div>
                                         {group.myStatus && (
                                             <div className="flex items-center gap-2 text-emerald-500 text-sm font-bold">

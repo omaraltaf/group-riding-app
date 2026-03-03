@@ -8,7 +8,7 @@ import {
     Clock,
     Users,
     Trophy,
-    Bike,
+    Car,
     MessageSquare,
     CheckCircle2,
     HelpCircle,
@@ -27,7 +27,7 @@ interface RSVP {
         id: string;
         name: string;
         image: string;
-        bikeTypes: string;
+        vehicleTypes: string;
         ridingExperience: string;
     };
 }
@@ -43,8 +43,8 @@ interface Ride {
     destinationUrl?: string | null;
     itinerary: string;
     terrainDifficulty: string;
-    suitableBikes: string;
-    riderCap: number | null;
+    suitableVehicles: string;
+    participantCap: number | null;
     isPublic: boolean;
     groupId: string;
     group: {
@@ -164,7 +164,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
     if (!ride) return null;
 
     const confirmedCount = (ride.rsvps || []).filter(r => r.status === "CONFIRMED").length;
-    const isFull = ride.riderCap ? confirmedCount >= ride.riderCap : false;
+    const isFull = ride.participantCap ? confirmedCount >= ride.participantCap : false;
 
     return (
         <main className="min-h-screen bg-zinc-950 text-white pb-20">
@@ -252,7 +252,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                                     </div>
                                     <div>
                                         <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider">Capacity</p>
-                                        <p className="font-semibold">{ride.riderCap ? `${confirmedCount} / ${ride.riderCap} riders` : "Unlimited"}</p>
+                                        <p className="font-semibold">{ride.participantCap ? `${confirmedCount} / ${ride.participantCap} participants` : "Unlimited"}</p>
                                     </div>
                                 </div>
                                 {ride.destination && (
@@ -351,7 +351,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                                         </div>
                                         <Link href={`/profile/${rsvp.user.id}`} className="hover:underline">
                                             <p className="text-sm font-bold">{rsvp.user.name}</p>
-                                            <p className="text-xs text-zinc-500">{rsvp.user.bikeTypes || "Motorcycle"}</p>
+                                            <p className="text-xs text-zinc-500">{rsvp.user.vehicleTypes || "Vehicle"}</p>
                                         </Link>
                                     </div>
                                 ))}
@@ -417,9 +417,9 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="h-8 w-8 bg-zinc-800 rounded-lg flex items-center justify-center">
-                                        <Bike className="h-4 w-4 text-zinc-500" />
+                                        <Car className="h-4 w-4 text-zinc-500" />
                                     </div>
-                                    <p className="text-sm text-zinc-400">Suitable for: <span className="text-white font-medium">{ride.suitableBikes || "Any bike"}</span></p>
+                                    <p className="text-sm text-zinc-400">Suitable for: <span className="text-white font-medium">{ride.suitableVehicles || "Any vehicle"}</span></p>
                                 </div>
                             </div>
 

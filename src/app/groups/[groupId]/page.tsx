@@ -11,7 +11,7 @@ import {
     User as UserIcon,
     Settings,
     LogOut,
-    Bike as BikeIcon,
+    Car as CarIcon,
     Trophy,
     Check,
     X,
@@ -32,12 +32,12 @@ interface Member {
         id: string;
         name: string;
         image: string;
-        bikeTypes: string;
-        ridingExperience: string;
+        vehicleTypes: string;
+        vehicleExperience: string;
     };
 }
 
-interface Ride {
+interface Trip {
     id: string;
     title: string;
     startTime: string;
@@ -57,7 +57,7 @@ interface Group {
     myStatus: string;
     status: string;
     memberships: Member[];
-    rides: Ride[];
+    rides: Trip[];
     _count: {
         memberships: number;
         rides: number;
@@ -222,7 +222,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                             <div className="p-6 bg-orange-600 rounded-2xl flex items-center justify-between shadow-xl shadow-orange-950/20">
                                 <div>
                                     <h3 className="font-bold text-lg">Join this group!</h3>
-                                    <p className="text-orange-100 text-sm">Join to see planned rides and connect with members.</p>
+                                    <p className="text-orange-100 text-sm">Join to see planned trips and connect with members.</p>
                                 </div>
                                 <button
                                     onClick={handleJoin}
@@ -293,7 +293,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                 className={`pb-4 text-sm font-semibold transition-all relative ${activeTab === "rides" ? "text-orange-500" : "text-zinc-500 hover:text-zinc-300"
                                     }`}
                             >
-                                Rides ({group.rides?.length || 0})
+                                Trips ({group.rides?.length || 0})
                                 {activeTab === "rides" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>}
                             </button>
                             <button
@@ -321,20 +321,20 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                             {activeTab === "rides" && (
                                 <>
                                     <div className="flex justify-between items-center mb-6">
-                                        <h3 className="text-xl font-semibold">Upcoming Rides</h3>
+                                        <h3 className="text-xl font-semibold">Upcoming Trips</h3>
                                         {group.isAdmin && (
                                             <Link
                                                 href={`/groups/${group.id}/rides/create`}
                                                 className="flex items-center gap-2 rounded-lg bg-zinc-800 px-3 py-1.5 text-xs font-bold hover:bg-zinc-700 transition-colors"
                                             >
-                                                <Plus className="h-3 w-3" /> New Ride
+                                                <Plus className="h-3 w-3" /> New Trip
                                             </Link>
                                         )}
                                     </div>
                                     {group.rides?.length === 0 ? (
                                         <div className="p-12 text-center bg-zinc-900 rounded-3xl ring-1 ring-zinc-800">
                                             <Calendar className="h-10 w-10 text-zinc-700 mx-auto mb-4" />
-                                            <p className="text-zinc-500">No rides planned yet.</p>
+                                            <p className="text-zinc-500">No trips planned yet.</p>
                                         </div>
                                     ) : (
                                         (group.rides || []).map((ride: any) => (
@@ -382,14 +382,14 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                                 </Link>
                                             </div>
                                             <div className="flex gap-2">
-                                                {member.user.ridingExperience && (
-                                                    <div className="h-8 w-8 rounded-lg bg-zinc-800 flex items-center justify-center" title={member.user.ridingExperience}>
+                                                {member.user.vehicleExperience && (
+                                                    <div className="h-8 w-8 rounded-lg bg-zinc-800 flex items-center justify-center" title={member.user.vehicleExperience}>
                                                         <Trophy className="h-4 w-4 text-zinc-500" />
                                                     </div>
                                                 )}
-                                                {member.user.bikeTypes && (
-                                                    <div className="h-8 w-8 rounded-lg bg-zinc-800 flex items-center justify-center" title={member.user.bikeTypes}>
-                                                        <BikeIcon className="h-4 w-4 text-zinc-500" />
+                                                {member.user.vehicleTypes && (
+                                                    <div className="h-8 w-8 rounded-lg bg-zinc-800 flex items-center justify-center" title={member.user.vehicleTypes}>
+                                                        <CarIcon className="h-4 w-4 text-zinc-500" />
                                                     </div>
                                                 )}
                                             </div>
@@ -414,8 +414,8 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                                     <div>
                                                         <p className="font-bold text-lg">{member.user.name}</p>
                                                         <div className="flex items-center gap-3 text-xs text-zinc-500 mt-1">
-                                                            <span className="flex items-center gap-1"><Trophy className="h-3 w-3" /> {member.user.ridingExperience}</span>
-                                                            <span className="flex items-center gap-1"><BikeIcon className="h-3 w-3" /> {member.user.bikeTypes || "None"}</span>
+                                                            <span className="flex items-center gap-1"><Trophy className="h-3 w-3" /> {member.user.vehicleExperience}</span>
+                                                            <span className="flex items-center gap-1"><CarIcon className="h-3 w-3" /> {member.user.vehicleTypes || "None"}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -447,7 +447,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                             <h3 className="font-bold mb-4 flex items-center gap-2">
                                 <LinkIcon className="h-4 w-4 text-orange-500" /> Invite Link
                             </h3>
-                            <p className="text-sm text-zinc-500 mb-4">Share this link to invite other riders to join the group.</p>
+                            <p className="text-sm text-zinc-500 mb-4">Share this link to invite other participants to join the group.</p>
                             <button
                                 onClick={copyInvite}
                                 className={`w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl ring-1 transition-all ${copied ? "bg-emerald-500/10 ring-emerald-500/20 text-emerald-500" : "bg-zinc-800 ring-zinc-700 text-zinc-400 hover:bg-zinc-700"
@@ -472,7 +472,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                     <span className="font-medium text-zinc-300">{group.joinPolicy === "OPEN" ? "Open" : "Private"}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-sm">
-                                    <span className="text-zinc-500">Rides Done</span>
+                                    <span className="text-zinc-500">Trips Done</span>
                                     <span className="font-medium text-zinc-300">0</span>
                                 </div>
                             </div>

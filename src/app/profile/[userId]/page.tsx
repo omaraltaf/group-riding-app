@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
-import { User, Phone, Bike, Trophy, Bell, Save, ChevronLeft } from "lucide-react";
+import { User, Phone, Car, Trophy, Bell, Save, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 
 export default function UserProfilePage({ params }: { params: Promise<{ userId: string }> }) {
@@ -17,8 +17,8 @@ export default function UserProfilePage({ params }: { params: Promise<{ userId: 
     const [formData, setFormData] = useState({
         name: "",
         phone: "",
-        bikeTypes: "",
-        ridingExperience: "",
+        vehicleTypes: "",
+        vehicleExperience: "",
         pushOptIn: false,
         image: "",
     });
@@ -43,8 +43,8 @@ export default function UserProfilePage({ params }: { params: Promise<{ userId: 
                     setFormData({
                         name: userData.name || "",
                         phone: userData.phone || "",
-                        bikeTypes: userData.bikeTypes || "",
-                        ridingExperience: userData.ridingExperience || "Beginner",
+                        vehicleTypes: userData.vehicleTypes || "",
+                        vehicleExperience: userData.vehicleExperience || "Beginner",
                         pushOptIn: userData.pushOptIn || false,
                         image: userData.image || "",
                     });
@@ -109,7 +109,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ userId: 
                                 {isMe ? "My Profile" : `${formData.name}'s Profile`}
                             </h1>
                             <p className="text-zinc-400">
-                                {isMe ? "Manage your bike details and preferences." : `Managing details for ${formData.name}.`}
+                                {isMe ? "Manage your vehicle details and preferences." : `Managing details for ${formData.name}.`}
                             </p>
                         </div>
                     </div>
@@ -162,29 +162,29 @@ export default function UserProfilePage({ params }: { params: Promise<{ userId: 
 
                     <section className="bg-zinc-900 rounded-2xl p-8 ring-1 ring-zinc-800">
                         <h3 className="text-lg font-semibold mb-6 flex items-center gap-2 text-zinc-400">
-                            <Bike className="h-5 w-5" /> Riding Profile
+                            <Car className="h-5 w-5" /> Travel Profile
                         </h3>
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-zinc-400">My Bikes</label>
+                                <label className="text-sm font-medium text-zinc-400">My Vehicles (Bikes/Cars/SUVs/4x4s)</label>
                                 <input
                                     type="text"
-                                    value={formData.bikeTypes}
-                                    onChange={(e) => setFormData({ ...formData, bikeTypes: e.target.value })}
+                                    value={formData.vehicleTypes}
+                                    onChange={(e) => setFormData({ ...formData, vehicleTypes: e.target.value })}
                                     className="w-full rounded-xl bg-zinc-800 border-0 py-3 px-4 text-white ring-1 ring-zinc-700 focus:ring-2 focus:ring-orange-500"
                                     placeholder="e.g. BMW R1250GS, Ducati Panigale"
                                     disabled={!isMe && !isAdmin}
                                 />
-                                <p className="text-xs text-zinc-500">List your current motorcycles separated by commas.</p>
+                                <p className="text-xs text-zinc-500">List your current vehicles separated by commas.</p>
                             </div>
 
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-zinc-400 flex items-center gap-2">
-                                    <Trophy className="h-4 w-4" /> Experience Level
+                                    <Trophy className="h-4 w-4" /> Vehicle Experience
                                 </label>
                                 <select
-                                    value={formData.ridingExperience}
-                                    onChange={(e) => setFormData({ ...formData, ridingExperience: e.target.value })}
+                                    value={formData.vehicleExperience}
+                                    onChange={(e) => setFormData({ ...formData, vehicleExperience: e.target.value })}
                                     className="w-full rounded-xl bg-zinc-800 border-0 py-3 px-4 text-white ring-1 ring-zinc-700 focus:ring-2 focus:ring-orange-500 appearance-none"
                                     disabled={!isMe && !isAdmin}
                                 >

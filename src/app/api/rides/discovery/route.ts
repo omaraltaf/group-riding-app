@@ -36,15 +36,18 @@ export async function GET(req: NextRequest) {
             where.startTime = { gte: new Date() };
         }
 
-        const rides = await prisma.ride.findMany({
+        const trips = await prisma.ride.findMany({
             where,
-            include: {
-                group: {
-                    select: { name: true }
-                },
-                _count: {
-                    select: { rsvps: { where: { status: "CONFIRMED" } } }
-                }
+            select: {
+                id: true,
+                title: true,
+                description: true,
+                startTime: true,
+                meetingPoint: true,
+                terrainDifficulty: true,
+                suitableVehicles: true,
+                group: { select: { name: true } },
+                _count: { select: { rsvps: { where: { status: "CONFIRMED" } } } }
             },
             orderBy: {
                 startTime: "asc",
@@ -55,13 +58,13 @@ export async function GET(req: NextRequest) {
         });
 
         let nextCursor: string | undefined = undefined;
-        if (rides.length > limit) {
-            const nextItem = rides.pop();
+        if (trips.length > limit) {
+            const nextItem = trips.pop();
             nextCursor = nextItem?.id;
         }
 
         return NextResponse.json({
-            rides,
+            trips,
             nextCursor,
         });
     } catch (error) {
