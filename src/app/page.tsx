@@ -65,10 +65,17 @@ export default async function Home() {
     // Return a fallback UI if data fetch fails instead of crashing
     return (
       <main className="min-h-screen bg-zinc-950 text-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Something went wrong</h1>
-          <p className="text-zinc-400">We couldn't load your dashboard. Please try again later.</p>
-          <pre className="mt-4 text-xs text-red-500">{error.message}</pre>
+        <div className="text-center p-8 bg-zinc-900 rounded-[2rem] ring-1 ring-zinc-800 shadow-2xl">
+          <h1 className="text-2xl font-bold mb-4 text-orange-500">Unable to load dashboard</h1>
+          <p className="text-zinc-400 max-w-sm mx-auto">
+            We encountered a problem connecting to the database. Please check your connection or try again in a few minutes.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-8 px-6 py-3 bg-zinc-800 rounded-xl text-sm font-bold hover:bg-zinc-700 transition-all"
+          >
+            Retry Connection
+          </button>
         </div>
       </main>
     );

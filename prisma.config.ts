@@ -1,28 +1,9 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
-const getDatabaseUrl = () => {
-    let url = process.env.DIRECT_URL || process.env.DATABASE_URL;
-    if (!url) return undefined;
+import { getConfiguredDatabaseUrl } from "./src/lib/db-utils";
 
-    // Feature branch database switching
-    if (process.env.VERCEL_GIT_COMMIT_REF === 'feature/vehicle-agnostic-v2' ||
-        process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF === 'feature/vehicle-agnostic-v2' ||
-        process.env.VERCEL_GIT_COMMIT_REF === 'update-vehicle-type' ||
-        process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF === 'update-vehicle-type') {
-        url = url.replace(/ep-[^.]+/, 'ep-long-leaf-aisgx9c1');
-    }
-
-    // If we're performing a migration and it's a Neon pooled URL,
-    // automatically derive the direct URL and clean up host.
-    if (!process.env.DIRECT_URL && url.includes("-pooler")) {
-        url = url.replace("-pooler", "");
-    }
-
-    return url;
-};
-
-const finalUrl = getDatabaseUrl();
+const finalUrl = getConfiguredDatabaseUrl(process.env.DIRECT_URL || process.env.DATABASE_URL);
 
 export default defineConfig({
     schema: "prisma/schema.prisma",

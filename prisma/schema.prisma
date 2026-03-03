@@ -10,7 +10,6 @@ datasource db {
 enum UserRole {
   PARTICIPANT
   PLATFORM_ADMIN
-  RIDER
 }
 
 enum JoinPolicy {

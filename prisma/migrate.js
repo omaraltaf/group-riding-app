@@ -1,24 +1,33 @@
 const { execSync } = require('child_process');
 const { URL } = require('url');
 
+/**
+ * Migration helper for Vercel build phase.
+ * Handles database host replacement for feature branches.
+ */
 function getDatabaseUrl() {
     let url = process.env.DIRECT_URL || process.env.DATABASE_URL;
     if (!url) return null;
 
+    const currentBranch = process.env.VERCEL_GIT_COMMIT_REF || process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF;
+
     // Feature branch database switching
-    if (process.env.VERCEL_GIT_COMMIT_REF === 'feature/vehicle-agnostic-v2' ||
-        process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF === 'feature/vehicle-agnostic-v2' ||
-        process.env.VERCEL_GIT_COMMIT_REF === 'update-vehicle-type' ||
-        process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF === 'update-vehicle-type') {
+    const devBranches = [
+        'feature/vehicle-agnostic-v2',
+        'update-vehicle-type'
+    ];
+
+    if (currentBranch && devBranches.includes(currentBranch)) {
+        // Use development database host (ep-long-leaf)
         url = url.replace(/ep-[^.]+/, 'ep-long-leaf-aisgx9c1');
     }
 
-    // 1. Derivation: Handle Neon pooled URLs
+    // Handle Neon pooled URLs by deriving direct connection
     if (!process.env.DIRECT_URL && url.includes("-pooler")) {
         url = url.replace("-pooler", "");
     }
 
-    // 2. Force parameters
+    // Force pgbouncer and timeout parameters for stability during build
     try {
         const urlObj = new URL(url);
         urlObj.searchParams.set("pgbouncer", "true");
@@ -36,22 +45,19 @@ if (!migrationUrl) {
     process.exit(1);
 }
 
-console.log(`🚀 Starting migration on host: ${new URL(migrationUrl).hostname}`);
-console.log(`🔗 Connection params: pgbouncer=${new URL(migrationUrl).searchParams.get("pgbouncer")}, timeout=${new URL(migrationUrl).searchParams.get("connect_timeout")}`);
+const currentHost = new URL(migrationUrl).hostname;
+console.log(`🚀 Starting migration on host: ${currentHost}`);
 
 try {
-    // Skip migration deploy if on update-vehicle-type branch as it's manually refactored
-    if (process.env.VERCEL_GIT_COMMIT_REF === 'update-vehicle-type' ||
-        process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF === 'update-vehicle-type') {
-        console.log("⏩ Skipping migration deploy for update-vehicle-type branch (manually refactored).");
+    const isRefactorBranch = process.env.VERCEL_GIT_COMMIT_REF === 'update-vehicle-type' ||
+        process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF === 'update-vehicle-type';
+
+    if (isRefactorBranch) {
+        console.log("⏩ Skipping Prisma Migrate Deploy (Schema managed manually for refactor).");
     } else {
-        // Run migration with the forced URL
         execSync('npx prisma migrate deploy', {
             stdio: 'inherit',
-            env: {
-                ...process.env,
-                DATABASE_URL: migrationUrl
-            }
+            env: { ...process.env, DATABASE_URL: migrationUrl }
         });
         console.log("✅ Migration completed successfully.");
     }
