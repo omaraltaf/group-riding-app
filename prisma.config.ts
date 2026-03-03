@@ -10,7 +10,7 @@ const getDatabaseUrl = () => {
         process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF === 'feature/vehicle-agnostic-v2' ||
         process.env.VERCEL_GIT_COMMIT_REF === 'update-vehicle-type' ||
         process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF === 'update-vehicle-type') {
-        url = url.replace('ep-bold-leaf-aiww3fi8', 'ep-long-leaf-aisgx9c1');
+        url = url.replace(/ep-[^.]+/, 'ep-long-leaf-aisgx9c1');
     }
 
     // If we're performing a migration and it's a Neon pooled URL,
