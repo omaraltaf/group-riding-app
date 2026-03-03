@@ -35,7 +35,7 @@ export async function GET(
             }
         });
 
-        if (!ride) return new NextResponse("Ride not found", { status: 404 });
+        if (!ride) return new NextResponse("Trip not found", { status: 404 });
 
         // Check if user is member of the group
         const membership = await prisma.membership.findUnique({
@@ -81,7 +81,7 @@ export async function PATCH(
             where: { id: rideId },
         });
 
-        if (!ride) return new NextResponse("Ride not found", { status: 404 });
+        if (!ride) return new NextResponse("Trip not found", { status: 404 });
 
         const isPlatformAdmin = user.role === "PLATFORM_ADMIN";
 
@@ -168,8 +168,8 @@ export async function PATCH(
                 data: participants.map((p) => ({
                     userId: p.userId,
                     type: "RIDE_UPDATE",
-                    title: "Ride Updated",
-                    message: `Important: Details for the ride "${updatedRide.title}" have been updated.`,
+                    title: "Trip Updated",
+                    message: `Important: Details for the trip "${updatedRide.title}" have been updated.`,
                     relatedId: rideId,
                 })),
             });
@@ -228,8 +228,8 @@ export async function DELETE(
                     data: participantsToNotify.map((p) => ({
                         userId: p.userId,
                         type: "RIDE_CANCEL",
-                        title: "Ride Cancelled",
-                        message: `The ride "${ride.title}" has been cancelled.`,
+                        title: "Trip Cancelled",
+                        message: `The trip "${ride.title}" has been cancelled.`,
                         relatedId: ride.groupId, // Link back to group since ride is gone
                     })),
                 });

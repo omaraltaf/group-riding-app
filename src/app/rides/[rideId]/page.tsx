@@ -28,7 +28,7 @@ interface RSVP {
         name: string;
         image: string;
         vehicleTypes: string;
-        ridingExperience: string;
+        vehicleExperience: string;
     };
 }
 
@@ -186,7 +186,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                                     {ride.terrainDifficulty}
                                 </span>
                                 {ride.isPublic && (
-                                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-zinc-800 text-zinc-400 ring-1 ring-zinc-700">Public Ride</span>
+                                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-zinc-800 text-zinc-400 ring-1 ring-zinc-700">Public Trip</span>
                                 )}
                             </div>
                             <div className="flex items-center justify-between gap-4 mb-4">
@@ -196,7 +196,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                                         href={`/rides/${rideId}/edit`}
                                         className="shrink-0 flex items-center gap-2 px-6 py-3 rounded-xl bg-zinc-800 text-zinc-300 font-bold hover:bg-zinc-700 transition-all active:scale-95 ring-1 ring-zinc-700"
                                     >
-                                        Edit Ride
+                                        Edit Trip
                                     </Link>
                                 )}
                             </div>
@@ -283,7 +283,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
 
                         <div className="space-y-6">
                             <h3 className="text-xl font-bold flex items-center gap-2">
-                                <MessageSquare className="h-5 w-5 text-orange-500" /> Ride Chat
+                                <MessageSquare className="h-5 w-5 text-orange-500" /> Trip Chat
                             </h3>
                             <div className="bg-zinc-900 rounded-[2rem] ring-1 ring-zinc-800 overflow-hidden flex flex-col h-[500px]">
                                 <div className="flex-1 overflow-y-auto p-6 space-y-4">
@@ -366,7 +366,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                             {isFull && ride.myRsvp !== "CONFIRMED" && (
                                 <div className="mb-6 p-4 bg-red-500/10 rounded-2xl ring-1 ring-red-500/20 flex items-center gap-3 text-red-500 text-sm">
                                     <AlertTriangle className="h-5 w-5 shrink-0" />
-                                    <p>This ride has reached its maximum capacity.</p>
+                                    <p>This trip has reached its maximum capacity.</p>
                                 </div>
                             )}
 
@@ -429,7 +429,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                                     }`}
                             >
                                 <Share2 className="h-4 w-4" />
-                                {copied ? "Link Copied!" : "Share Ride"}
+                                {copied ? "Link Copied!" : "Share Trip"}
                             </button>
                         </div>
                     </div>

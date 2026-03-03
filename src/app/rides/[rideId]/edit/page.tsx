@@ -127,7 +127,7 @@ export default function EditRidePage({ params }: { params: Promise<{ rideId: str
                         <ChevronLeft className="h-5 w-5" />
                         <span>Back to Ride</span>
                     </Link>
-                    <h1 className="text-xl font-bold">Edit Ride</h1>
+                    <h1 className="text-xl font-bold">Edit Trip</h1>
                     <button
                         onClick={handleDelete}
                         disabled={deleting}
@@ -147,7 +147,7 @@ export default function EditRidePage({ params }: { params: Promise<{ rideId: str
                         </h3>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-400">Ride Title</label>
+                            <label className="text-sm font-medium text-zinc-400">Trip Title</label>
                             <input
                                 required
                                 type="text"
@@ -165,7 +165,7 @@ export default function EditRidePage({ params }: { params: Promise<{ rideId: str
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 className="w-full rounded-2xl bg-zinc-800 border-0 py-4 px-5 text-white ring-1 ring-zinc-700 focus:ring-2 focus:ring-orange-500 transition-all"
-                                placeholder="What is the plan for this ride?"
+                                placeholder="What is the plan for this trip?"
                             />
                         </div>
                     </section>
@@ -282,8 +282,8 @@ export default function EditRidePage({ params }: { params: Promise<{ rideId: str
                                     {formData.isPublic ? <Globe className="h-6 w-6 text-orange-500" /> : <Lock className="h-6 w-6 text-zinc-500" />}
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-white">Public Ride</h3>
-                                    <p className="text-sm text-zinc-500">Visible to riders outside this group.</p>
+                                    <h3 className="font-bold text-white">Public Trip</h3>
+                                    <p className="text-sm text-zinc-500">Visible to participants outside this group.</p>
                                 </div>
                             </div>
                             <button

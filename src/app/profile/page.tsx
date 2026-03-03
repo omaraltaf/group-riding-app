@@ -88,7 +88,7 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between mb-12">
                     <div>
                         <h1 className="text-4xl font-black mb-2 tracking-tight">My Profile</h1>
-                        <p className="text-zinc-400">Manage your bike details and preferences.</p>
+                        <p className="text-zinc-400">Manage your vehicle details and preferences.</p>
                     </div>
                     <div className="h-12 w-12 bg-zinc-900 rounded-2xl flex items-center justify-center ring-1 ring-zinc-800">
                         <User className="h-6 w-6 text-zinc-400" />
@@ -146,7 +146,7 @@ export default function ProfilePage() {
                                     value={formData.vehicleTypes}
                                     onChange={(e) => setFormData({ ...formData, vehicleTypes: e.target.value })}
                                     className="w-full rounded-xl bg-zinc-800 border-0 py-3 px-4 text-white ring-1 ring-zinc-700 focus:ring-2 focus:ring-orange-500"
-                                    placeholder="e.g. BMW R1250GS, Tesla Model 3"
+                                    placeholder="e.g. Toyota Land Cruiser, BMW R1250GS"
                                 />
                                 <p className="text-xs text-zinc-500">List your current vehicles separated by commas.</p>
                             </div>
@@ -177,7 +177,7 @@ export default function ProfilePage() {
                                 </div>
                                 <div>
                                     <h3 className="font-semibold text-white">Push Notifications</h3>
-                                    <p className="text-sm text-zinc-500">Get alerts for new rides and RSVP updates.</p>
+                                    <p className="text-sm text-zinc-500">Get alerts for new trips and RSVP updates.</p>
                                 </div>
                             </div>
                             <button
