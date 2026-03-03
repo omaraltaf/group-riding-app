@@ -54,7 +54,7 @@ export default function DiscoverTripsPage() {
                 params.append("cursor", nextCursor);
             }
 
-            const res = await fetch(`/api/rides/discovery?${params.toString()}`);
+            const res = await fetch(`/api/trips/discovery?${params.toString()}`);
             if (res.status === 401) {
                 window.location.href = "/login";
                 return;
@@ -171,7 +171,7 @@ export default function DiscoverTripsPage() {
                             {trips.map(trip => (
                                 <Link
                                     key={trip.id}
-                                    href={`/rides/${trip.id}`}
+                                    href={`/trips/${trip.id}`}
                                     className="group relative overflow-hidden rounded-[2rem] bg-zinc-900 p-8 ring-1 ring-zinc-800 hover:ring-orange-500/50 transition-all hover:bg-zinc-900/50 flex flex-col justify-between shadow-2xl shadow-black/50"
                                 >
                                     <div>

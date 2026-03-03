@@ -205,7 +205,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ userId: 
                                 </div>
                                 <div>
                                     <h3 className="font-semibold text-white">Push Notifications</h3>
-                                    <p className="text-sm text-zinc-500">Get alerts for new rides and RSVP updates.</p>
+                                    <p className="text-sm text-zinc-500">Get alerts for new trips and RSVP updates.</p>
                                 </div>
                             </div>
                             <button
