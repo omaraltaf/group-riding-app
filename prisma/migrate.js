@@ -40,15 +40,21 @@ console.log(`🚀 Starting migration on host: ${new URL(migrationUrl).hostname}`
 console.log(`🔗 Connection params: pgbouncer=${new URL(migrationUrl).searchParams.get("pgbouncer")}, timeout=${new URL(migrationUrl).searchParams.get("connect_timeout")}`);
 
 try {
-    // Run migration with the forced URL
-    execSync('npx prisma migrate deploy', {
-        stdio: 'inherit',
-        env: {
-            ...process.env,
-            DATABASE_URL: migrationUrl
-        }
-    });
-    console.log("✅ Migration completed successfully.");
+    // Skip migration deploy if on update-vehicle-type branch as it's manually refactored
+    if (process.env.VERCEL_GIT_COMMIT_REF === 'update-vehicle-type' ||
+        process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF === 'update-vehicle-type') {
+        console.log("⏩ Skipping migration deploy for update-vehicle-type branch (manually refactored).");
+    } else {
+        // Run migration with the forced URL
+        execSync('npx prisma migrate deploy', {
+            stdio: 'inherit',
+            env: {
+                ...process.env,
+                DATABASE_URL: migrationUrl
+            }
+        });
+        console.log("✅ Migration completed successfully.");
+    }
 } catch (error) {
     console.error("❌ Migration failed.");
     process.exit(1);
