@@ -1,115 +1,102 @@
-import { createClient } from "@libsql/client";
+import postgres from "postgres";
 import bcrypt from "bcryptjs";
 import "dotenv/config";
 import { nanoid } from "nanoid";
 
-const url = "file:./dev.db"; // Matching what prisma db push used successfully
-const client = createClient({ url });
+const url = process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL;
+if (!url) {
+    throw new Error("DATABASE_URL is not defined in environment variables");
+}
+
+const sql = postgres(url, { ssl: "require" });
 
 async function run() {
-    console.log("Direct SQL Seeding started...");
+    console.log("Direct SQL Seeding started (PostgreSQL with postgres.js)...");
 
     try {
-        // Clean up
-        await client.execute("DELETE FROM Notification");
-        await client.execute("DELETE FROM Message");
-        await client.execute("DELETE FROM RSVP");
-        await client.execute("DELETE FROM Ride");
-        await client.execute("DELETE FROM Membership");
-        await client.execute("DELETE FROM [Group]");
-        await client.execute("DELETE FROM User");
+        // Clean up - Note: Order matters for foreign keys
+        console.log("Cleaning up existing data...");
+        await sql`DELETE FROM "Notification"`;
+        await sql`DELETE FROM "Message"`;
+        await sql`DELETE FROM "RSVP"`;
+        await sql`DELETE FROM "Ride"`;
+        await sql`DELETE FROM "Membership"`;
+        await sql`DELETE FROM "Group"`;
+        await sql`DELETE FROM "User"`;
 
         const adminId = nanoid();
-        const rider1Id = nanoid();
-        const rider2Id = nanoid();
+        const member1Id = nanoid();
+        const member2Id = nanoid();
         const hAdminPw = await bcrypt.hash("admin123", 10);
-        const hRiderPw = await bcrypt.hash("password123", 10);
+        const hMemberPw = await bcrypt.hash("password123", 10);
 
         // Users
-        await client.execute({
-            sql: "INSERT INTO User (id, email, password, name, role, ridingExperience, bikeTypes, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))",
-            args: [adminId, "admin@tripkarlo.com", hAdminPw, "Platform Admin", "PLATFORM_ADMIN", "Professional", "Road, Mountain, Gravel"]
-        });
+        console.log("Inserting users...");
+        await sql`
+            INSERT INTO "User" (id, email, password, name, role, "vehicleExperience", "vehicleTypes", "createdAt", "updatedAt") 
+            VALUES (${adminId}, 'admin@tripkarlo.com', ${hAdminPw}, 'Platform Admin', 'PLATFORM_ADMIN', 'Professional', 'Bikes, Cars, SUVs, 4x4s', NOW(), NOW())
+        `;
 
-        await client.execute({
-            sql: "INSERT INTO User (id, email, password, name, role, ridingExperience, bikeTypes, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))",
-            args: [rider1Id, "omar@example.com", hRiderPw, "Omar Altaf", "RIDER", "Advanced", "Road, Gravel"]
-        });
+        await sql`
+            INSERT INTO "User" (id, email, password, name, role, "vehicleExperience", "vehicleTypes", "createdAt", "updatedAt") 
+            VALUES (${member1Id}, 'omar@example.com', ${hMemberPw}, 'Omar Altaf', 'PARTICIPANT', 'Advanced', 'SUV, 4x4', NOW(), NOW())
+        `;
 
-        await client.execute({
-            sql: "INSERT INTO User (id, email, password, name, role, ridingExperience, bikeTypes, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))",
-            args: [rider2Id, "sarah@example.com", hRiderPw, "Sarah Rider", "RIDER", "Intermediate", "Mountain"]
-        });
+        await sql`
+            INSERT INTO "User" (id, email, password, name, role, "vehicleExperience", "vehicleTypes", "createdAt", "updatedAt") 
+            VALUES (${member2Id}, 'sarah@example.com', ${hMemberPw}, 'Sarah Explorer', 'PARTICIPANT', 'Intermediate', 'Motorcycle', NOW(), NOW())
+        `;
 
         const group1Id = nanoid();
         const group2Id = nanoid();
 
         // Groups
-        await client.execute({
-            sql: "INSERT INTO [Group] (id, name, description, joinPolicy, inviteCode, creatorId, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))",
-            args: [group1Id, "Alpine Explorers", "A community for high-altitude adventure seekers.", "REQUEST_ONLY", "ALPINE-EXP", adminId]
-        });
+        console.log("Inserting groups...");
+        await sql`
+            INSERT INTO "Group" (id, name, description, "joinPolicy", "inviteCode", "creatorId", "createdAt", "updatedAt") 
+            VALUES (${group1Id}, 'Alpine Explorers', 'A community for high-altitude adventure seekers (4x4s & Bikes).', 'REQUEST_ONLY', 'ALPINE-EXP', ${adminId}, NOW(), NOW())
+        `;
 
-        await client.execute({
-            sql: "INSERT INTO [Group] (id, name, description, joinPolicy, inviteCode, creatorId, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))",
-            args: [group2Id, "Coastal Cruisers", "Easy-going rides along the beautiful coastline.", "OPEN", "COASTAL", rider1Id]
-        });
+        await sql`
+            INSERT INTO "Group" (id, name, description, "joinPolicy", "inviteCode", "creatorId", "createdAt", "updatedAt") 
+            VALUES (${group2Id}, 'Coastal Cruisers', 'Easy-going trips along the beautiful coastline.', 'OPEN', 'COASTAL', ${member1Id}, NOW(), NOW())
+        `;
 
         // Memberships
-        await client.execute({
-            sql: "INSERT INTO Membership (id, role, status, userId, groupId, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))",
-            args: [nanoid(), "ADMIN", "APPROVED", adminId, group1Id]
-        });
-        await client.execute({
-            sql: "INSERT INTO Membership (id, role, status, userId, groupId, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))",
-            args: [nanoid(), "MEMBER", "APPROVED", rider1Id, group1Id]
-        });
-        await client.execute({
-            sql: "INSERT INTO Membership (id, role, status, userId, groupId, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))",
-            args: [nanoid(), "ADMIN", "APPROVED", rider1Id, group2Id]
-        });
+        console.log("Inserting memberships...");
+        await sql`INSERT INTO "Membership" (id, role, status, "userId", "groupId", "createdAt", "updatedAt") VALUES (${nanoid()}, 'ADMIN', 'APPROVED', ${adminId}, ${group1Id}, NOW(), NOW())`;
+        await sql`INSERT INTO "Membership" (id, role, status, "userId", "groupId", "createdAt", "updatedAt") VALUES (${nanoid()}, 'MEMBER', 'APPROVED', ${member1Id}, ${group1Id}, NOW(), NOW())`;
+        await sql`INSERT INTO "Membership" (id, role, status, "userId", "groupId", "createdAt", "updatedAt") VALUES (${nanoid()}, 'ADMIN', 'APPROVED', ${member1Id}, ${group2Id}, NOW(), NOW())`;
 
         // Rides
+        console.log("Inserting trips...");
         const ride1Id = nanoid();
         const ride2Id = nanoid();
-        await client.execute({
-            sql: "INSERT INTO Ride (id, title, description, startTime, meetingPoint, terrainDifficulty, suitableBikes, riderCap, isPublic, groupId, creatorId, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))",
-            args: [ride1Id, "Black Forest Sunrise", "Epic morning climb.", datetimePlusHours(24), "Central Hub Fountain", "Challenging", "Road Bike", 15, 1, group1Id, adminId]
-        });
+        await sql`
+            INSERT INTO "Ride" (id, title, description, "startTime", "meetingPoint", "terrainDifficulty", "suitableVehicles", "participantCap", "isPublic", "groupId", "creatorId", "createdAt", "updatedAt") 
+            VALUES (${ride1Id}, 'Black Forest Sunrise', 'Epic morning climb for all vehicle types.', ${new Date(Date.now() + 24 * 3600 * 1000)}, 'Central Hub Fountain', 'Challenging', 'Any', 15, true, ${group1Id}, ${adminId}, NOW(), NOW())
+        `;
 
-        await client.execute({
-            sql: "INSERT INTO Ride (id, title, description, startTime, meetingPoint, terrainDifficulty, suitableBikes, riderCap, isPublic, groupId, creatorId, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))",
-            args: [ride2Id, "Beach Road Coffee Run", "Chill 30km flat ride.", datetimePlusHours(168), "North Pier Entrance", "Easy", "Any", 25, 1, group2Id, rider1Id]
-        });
+        await sql`
+            INSERT INTO "Ride" (id, title, description, "startTime", "meetingPoint", "terrainDifficulty", "suitableVehicles", "participantCap", "isPublic", "groupId", "creatorId", "createdAt", "updatedAt") 
+            VALUES (${ride2Id}, 'Beach Road Coffee Run', 'Chill 30km flat drive. Suitable for Sedans.', ${new Date(Date.now() + 168 * 3600 * 1000)}, 'North Pier Entrance', 'Easy', 'Cars, SUVs', 25, true, ${group2Id}, ${member1Id}, NOW(), NOW())
+        `;
 
         // RSVPs
-        await client.execute({
-            sql: "INSERT INTO RSVP (id, status, userId, rideId, createdAt, updatedAt) VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))",
-            args: [nanoid(), "CONFIRMED", adminId, ride1Id]
-        });
-        await client.execute({
-            sql: "INSERT INTO RSVP (id, status, userId, rideId, createdAt, updatedAt) VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))",
-            args: [nanoid(), "CONFIRMED", rider1Id, ride1Id]
-        });
+        console.log("Inserting RSVPs...");
+        await sql`INSERT INTO "RSVP" (id, status, "userId", "rideId", "createdAt", "updatedAt") VALUES (${nanoid()}, 'CONFIRMED', ${adminId}, ${ride1Id}, NOW(), NOW())`;
+        await sql`INSERT INTO "RSVP" (id, status, "userId", "rideId", "createdAt", "updatedAt") VALUES (${nanoid()}, 'CONFIRMED', ${member1Id}, ${ride1Id}, NOW(), NOW())`;
 
         // Messages
-        await client.execute({
-            sql: "INSERT INTO Message (id, content, userId, rideId, createdAt, updatedAt) VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))",
-            args: [nanoid(), "Looking forward to this! Don't forget your lights.", adminId, ride1Id]
-        });
+        console.log("Inserting messages...");
+        await sql`INSERT INTO "Message" (id, content, "userId", "rideId", "createdAt", "updatedAt") VALUES (${nanoid()}, 'Looking forward to this! Don''t forget your gear.', ${adminId}, ${ride1Id}, NOW(), NOW())`;
 
         console.log("Direct SQL Seeding completed successfully!");
     } catch (e) {
         console.error("Direct SQL Seeding failed:", e);
     } finally {
-        client.close();
+        await sql.end();
     }
-}
-
-function datetimePlusHours(h: number) {
-    const d = new Date();
-    d.setHours(d.getHours() + h);
-    return d.toISOString();
 }
 
 run();

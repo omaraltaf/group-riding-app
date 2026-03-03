@@ -44,7 +44,7 @@ export default function CreateGroupPage() {
                         <ChevronLeft className="h-5 w-5" />
                         <span>Back to Groups</span>
                     </Link>
-                    <h1 className="text-xl font-bold">New Riding Group</h1>
+                    <h1 className="text-xl font-bold">New Group</h1>
                     <div className="w-20"></div>
                 </div>
             </nav>

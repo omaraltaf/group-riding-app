@@ -153,31 +153,27 @@ export async function PATCH(
             },
         });
 
-        // NOTIFICATION: Notify all RSVP'd riders about the update
-        const participants = await prisma.rSVP.findMany({
-            where: {
-                rideId: rideId,
-                status: { in: ["CONFIRMED", "INTERESTED"] },
-                userId: { not: user.id }, // Don't notify the person making the update
-            },
-            select: { userId: true },
+        // NOTIFICATION: Notify all RSVP'd participants about the update
+        const rsvps = await prisma.rSVP.findMany({
+            where: { rideId, status: "CONFIRMED" },
+            select: { userId: true }
         });
 
-        if (participants.length > 0) {
+        if (rsvps.length > 0) {
             await prisma.notification.createMany({
-                data: participants.map((p) => ({
-                    userId: p.userId,
+                data: rsvps.map(r => ({
+                    userId: r.userId,
                     type: "RIDE_UPDATE",
                     title: "Trip Updated",
-                    message: `Important: Details for the trip "${updatedRide.title}" have been updated.`,
-                    relatedId: rideId,
-                })),
+                    message: `The trip "${updatedRide.title}" has been updated.`,
+                    relatedId: rideId
+                }))
             });
         }
 
         return NextResponse.json(updatedRide);
     } catch (error) {
-        console.error("RIDE_PATCH_ERROR", error);
+        console.error("RIDE_UPDATE_ERROR", error);
         return new NextResponse("Internal server error", { status: 500 });
     }
 }
@@ -193,19 +189,14 @@ export async function DELETE(
 
         const ride = await prisma.ride.findUnique({
             where: { id: rideId },
-            include: {
-                rsvps: {
-                    where: { status: { in: ["CONFIRMED", "INTERESTED"] } },
-                    select: { userId: true }
-                }
-            }
+            select: { creatorId: true, title: true, groupId: true }
         });
 
-        if (!ride) return new NextResponse("Ride not found", { status: 404 });
+        if (!ride) return new NextResponse("Trip not found", { status: 404 });
 
         const isPlatformAdmin = user.role === "PLATFORM_ADMIN";
 
-        if (!isPlatformAdmin) {
+        if (ride.creatorId !== user.id && !isPlatformAdmin) {
             const membership = await prisma.membership.findUnique({
                 where: {
                     userId_groupId: {
@@ -220,20 +211,23 @@ export async function DELETE(
             }
         }
 
-        // NOTIFICATION: Notify all RSVP'd riders about the cancellation BEFORE deleting
-        if (ride.rsvps.length > 0) {
-            const participantsToNotify = ride.rsvps.filter(r => r.userId !== user.id);
-            if (participantsToNotify.length > 0) {
-                await prisma.notification.createMany({
-                    data: participantsToNotify.map((p) => ({
-                        userId: p.userId,
-                        type: "RIDE_CANCEL",
-                        title: "Trip Cancelled",
-                        message: `The trip "${ride.title}" has been cancelled.`,
-                        relatedId: ride.groupId, // Link back to group since ride is gone
-                    })),
-                });
-            }
+        // NOTIFICATION: Notify all RSVP'd participants about the cancellation BEFORE deleting
+        const rsvps = await prisma.rSVP.findMany({
+            where: { rideId, status: "CONFIRMED" },
+            select: { userId: true }
+        });
+
+        const participantsToNotify = rsvps.filter(r => r.userId !== user.id);
+        if (participantsToNotify.length > 0) {
+            await prisma.notification.createMany({
+                data: participantsToNotify.map((p) => ({
+                    userId: p.userId,
+                    type: "RIDE_CANCEL",
+                    title: "Trip Cancelled",
+                    message: `The trip "${ride.title}" has been cancelled.`,
+                    relatedId: ride.groupId, // Link back to group since ride is gone
+                })),
+            });
         }
 
         await prisma.$transaction([
