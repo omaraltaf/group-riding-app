@@ -7,9 +7,14 @@ export default async function Navbar() {
 
     if (!user) return null;
 
-    const unreadNotificationsCount = await prisma.notification.count({
-        where: { userId: user.id, isRead: false }
-    });
+    let unreadNotificationsCount = 0;
+    try {
+        unreadNotificationsCount = await prisma.notification.count({
+            where: { userId: user.id, isRead: false }
+        });
+    } catch (error) {
+        console.error("[Navbar] Fetch error:", error);
+    }
 
     return (
         <NavbarClient

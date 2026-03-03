@@ -163,7 +163,7 @@ export async function PATCH(
             await prisma.notification.createMany({
                 data: rsvps.map(r => ({
                     userId: r.userId,
-                    type: "RIDE_UPDATE",
+                    type: "TRIP_UPDATE",
                     title: "Trip Updated",
                     message: `The trip "${updatedTrip.title}" has been updated.`,
                     relatedId: tripId
@@ -222,7 +222,7 @@ export async function DELETE(
             await prisma.notification.createMany({
                 data: participantsToNotify.map((p) => ({
                     userId: p.userId,
-                    type: "RIDE_CANCEL",
+                    type: "TRIP_CANCEL",
                     title: "Trip Cancelled",
                     message: `The trip "${trip.title}" has been cancelled.`,
                     relatedId: trip.groupId, // Link back to group since trip is gone

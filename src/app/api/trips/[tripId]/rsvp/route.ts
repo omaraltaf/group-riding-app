@@ -63,7 +63,7 @@ export async function POST(
             await prisma.notification.create({
                 data: {
                     userId: trip.creatorId,
-                    type: "RIDE_UPDATE",
+                    type: "TRIP_UPDATE",
                     title: "New RSVP!",
                     message: `${user.name} is ${status.toLowerCase()} for your trip "${trip.title}".`,
                     relatedId: tripId,

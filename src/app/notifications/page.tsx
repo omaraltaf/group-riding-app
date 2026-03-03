@@ -64,9 +64,9 @@ export default function NotificationsPage() {
 
     const getIcon = (type: string) => {
         switch (type) {
-            case "RIDE_UPDATE":
-            case "RIDE_NEW":
-            case "RIDE_CANCEL":
+            case "TRIP_UPDATE":
+            case "TRIP_NEW":
+            case "TRIP_CANCEL":
                 return <Calendar className="h-5 w-5 text-orange-500" />;
             case "GROUP_INVITE":
             case "GROUP_JOIN":
@@ -87,12 +87,12 @@ export default function NotificationsPage() {
             case "JOIN_REJECT":
             case "GROUP_CREATE_REQUEST":
                 return `/groups/${relatedId}`;
-            case "RIDE_UPDATE":
-            case "RIDE_NEW":
+            case "TRIP_UPDATE":
+            case "TRIP_NEW":
             case "TRIP_UPDATE":
             case "TRIP_NEW":
             case "MESSAGE":
-            case "RIDE_CANCEL":
+            case "TRIP_CANCEL":
             case "TRIP_CANCEL":
                 return `/trips/${relatedId}`;
             default:

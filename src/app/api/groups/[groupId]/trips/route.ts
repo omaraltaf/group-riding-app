@@ -97,7 +97,7 @@ export async function POST(
             await prisma.notification.createMany({
                 data: members.map((m) => ({
                     userId: m.userId,
-                    type: "RIDE_NEW",
+                    type: "TRIP_NEW",
                     title: "New Trip Scheduled!",
                     message: `${user.name} posted a new trip: "${title}" in "${(trip as any).group.name}".`,
                     relatedId: trip.id,
