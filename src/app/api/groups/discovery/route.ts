@@ -26,7 +26,7 @@ export async function GET(req: Request) {
                         memberships: {
                             where: { status: "APPROVED" },
                         },
-                        rides: true,
+                        trips: true,
                     },
                 },
                 memberships: {

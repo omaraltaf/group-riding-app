@@ -10,7 +10,7 @@ async function main() {
         await prisma.notification.deleteMany();
         await prisma.message.deleteMany();
         await prisma.rSVP.deleteMany();
-        await prisma.ride.deleteMany();
+        await prisma.trip.deleteMany();
         await prisma.membership.deleteMany();
         await prisma.group.deleteMany();
         await prisma.user.deleteMany();
@@ -61,7 +61,7 @@ async function main() {
                 data: {
                     name: groupData[i].name,
                     description: groupData[i].description,
-                    joinPolicy: groupData[i].joinPolicy,
+                    joinPolicy: groupData[i].joinPolicy as any,
                     status: "APPROVED",
                     inviteCode: `JOIN-${groupData[i].name.replace(/\s+/g, '-').toUpperCase()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
                     creatorId: users[i].id,
@@ -91,9 +91,9 @@ async function main() {
                 }
             }
 
-            // Create 3 rides for each group
-            console.log(`Creating rides for ${group.name}...`);
-            const rideTypes = ["Morning Trip", "Afternoon Trip", "Social Cruise"];
+            // Create 3 trips for each group
+            console.log(`Creating trips for ${group.name}...`);
+            const tripTypes = ["Morning Trip", "Afternoon Trip", "Social Cruise"];
             for (let k = 0; k < 3; k++) {
                 const startTime = new Date();
                 startTime.setDate(startTime.getDate() + (k + 1));
@@ -102,10 +102,10 @@ async function main() {
                 const endTime = new Date(startTime);
                 endTime.setHours(startTime.getHours() + 2);
 
-                await prisma.ride.create({
+                await prisma.trip.create({
                     data: {
-                        title: `${group.name} - ${rideTypes[k]}`,
-                        description: `A ${rideTypes[k].toLowerCase()} for the ${group.name} community.`,
+                        title: `${group.name} - ${tripTypes[k]}`,
+                        description: `A ${tripTypes[k].toLowerCase()} for the ${group.name} community.`,
                         startTime,
                         endTime,
                         meetingPoint: "Central Hub",

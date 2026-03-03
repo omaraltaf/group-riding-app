@@ -12,9 +12,9 @@ async function list() {
     try {
         const userCount = await prisma.user.count();
         const groupCount = await prisma.group.count();
-        const rideCount = await prisma.ride.count();
+        const tripCount = await prisma.trip.count();
 
-        console.log(`Summary: Users: ${userCount}, Groups: ${groupCount}, Rides: ${rideCount}`);
+        console.log(`Summary: Users: ${userCount}, Groups: ${groupCount}, Trips: ${tripCount}`);
 
         const groups = await prisma.group.findMany();
         console.log("\nGroups found:");

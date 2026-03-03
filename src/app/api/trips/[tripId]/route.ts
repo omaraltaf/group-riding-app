@@ -6,15 +6,15 @@ export const runtime = "nodejs";
 
 export async function GET(
     req: Request,
-    { params }: { params: Promise<{ rideId: string }> }
+    { params }: { params: Promise<{ tripId: string }> }
 ) {
-    const { rideId } = await params;
+    const { tripId } = await params;
     try {
         const user = await getCurrentUser();
         if (!user) return new NextResponse("Unauthorized", { status: 401 });
 
-        const ride = await prisma.ride.findUnique({
-            where: { id: rideId },
+        const trip = await prisma.trip.findUnique({
+            where: { id: tripId },
             include: {
                 group: {
                     select: { id: true, name: true, joinPolicy: true }
@@ -35,53 +35,53 @@ export async function GET(
             }
         });
 
-        if (!ride) return new NextResponse("Trip not found", { status: 404 });
+        if (!trip) return new NextResponse("Trip not found", { status: 404 });
 
         // Check if user is member of the group
         const membership = await prisma.membership.findUnique({
             where: {
                 userId_groupId: {
                     userId: user.id,
-                    groupId: ride.groupId
+                    groupId: trip.groupId
                 }
             }
         });
 
         const isPlatformAdmin = user.role === "PLATFORM_ADMIN";
 
-        if (!membership && !ride.isPublic && !isPlatformAdmin) {
+        if (!membership && !trip.isPublic && !isPlatformAdmin) {
             return new NextResponse("Forbidden", { status: 403 });
         }
 
-        const myRsvp = (ride as any).rsvps.find((r: any) => r.userId === user.id);
+        const myRsvp = (trip as any).rsvps.find((r: any) => r.userId === user.id);
 
         return NextResponse.json({
-            ...ride,
+            ...trip,
             isMember: !!membership,
             isAdmin: isPlatformAdmin || membership?.role === "ADMIN",
-            isCreator: (ride as any).creatorId === user.id,
+            isCreator: (trip as any).creatorId === user.id,
             myRsvp: myRsvp?.status || null,
         });
     } catch (error) {
-        console.error("RIDE_GET_ERROR", error);
+        console.error("TRIP_GET_ERROR", error);
         return new NextResponse("Internal server error", { status: 500 });
     }
 }
 
 export async function PATCH(
     req: Request,
-    { params }: { params: Promise<{ rideId: string }> }
+    { params }: { params: Promise<{ tripId: string }> }
 ) {
-    const { rideId } = await params;
+    const { tripId } = await params;
     try {
         const user = await getCurrentUser();
         if (!user) return new NextResponse("Unauthorized", { status: 401 });
 
-        const ride = await prisma.ride.findUnique({
-            where: { id: rideId },
+        const trip = await prisma.trip.findUnique({
+            where: { id: tripId },
         });
 
-        if (!ride) return new NextResponse("Trip not found", { status: 404 });
+        if (!trip) return new NextResponse("Trip not found", { status: 404 });
 
         const isPlatformAdmin = user.role === "PLATFORM_ADMIN";
 
@@ -90,12 +90,12 @@ export async function PATCH(
                 where: {
                     userId_groupId: {
                         userId: user.id,
-                        groupId: ride.groupId
+                        groupId: trip.groupId
                     }
                 }
             });
 
-            if (!membership || (membership.role !== "ADMIN" && ride.creatorId !== user.id)) {
+            if (!membership || (membership.role !== "ADMIN" && trip.creatorId !== user.id)) {
                 return new NextResponse("Forbidden", { status: 403 });
             }
         }
@@ -118,13 +118,13 @@ export async function PATCH(
             meetingPointUrl,
         } = body;
 
-        const rideStartTime = startTime ? new Date(startTime) : null;
-        if (rideStartTime && rideStartTime.toString() === "Invalid Date") {
+        const tripStartTime = startTime ? new Date(startTime) : null;
+        if (tripStartTime && tripStartTime.toString() === "Invalid Date") {
             return new NextResponse("Invalid start time", { status: 400 });
         }
 
-        const rideEndTime = endTime ? new Date(endTime) : null;
-        if (rideEndTime && rideEndTime.toString() === "Invalid Date") {
+        const tripEndTime = endTime ? new Date(endTime) : null;
+        if (tripEndTime && tripEndTime.toString() === "Invalid Date") {
             return new NextResponse("Invalid end time", { status: 400 });
         }
 
@@ -133,13 +133,13 @@ export async function PATCH(
             return new NextResponse("Invalid participant capacity", { status: 400 });
         }
 
-        const updatedRide = await prisma.ride.update({
-            where: { id: rideId },
+        const updatedTrip = await prisma.trip.update({
+            where: { id: tripId },
             data: {
                 title: title === "" ? undefined : title,
                 description: description === "" ? undefined : description,
-                startTime: rideStartTime || undefined,
-                endTime: rideEndTime || undefined,
+                startTime: tripStartTime || undefined,
+                endTime: tripEndTime || undefined,
                 meetingPoint: meetingPoint === "" ? undefined : meetingPoint,
                 itinerary,
                 terrainDifficulty,
@@ -155,7 +155,7 @@ export async function PATCH(
 
         // NOTIFICATION: Notify all RSVP'd participants about the update
         const rsvps = await prisma.rSVP.findMany({
-            where: { rideId, status: "CONFIRMED" },
+            where: { tripId, status: "CONFIRMED" },
             select: { userId: true }
         });
 
@@ -165,43 +165,43 @@ export async function PATCH(
                     userId: r.userId,
                     type: "RIDE_UPDATE",
                     title: "Trip Updated",
-                    message: `The trip "${updatedRide.title}" has been updated.`,
-                    relatedId: rideId
+                    message: `The trip "${updatedTrip.title}" has been updated.`,
+                    relatedId: tripId
                 }))
             });
         }
 
-        return NextResponse.json(updatedRide);
+        return NextResponse.json(updatedTrip);
     } catch (error) {
-        console.error("RIDE_UPDATE_ERROR", error);
+        console.error("TRIP_UPDATE_ERROR", error);
         return new NextResponse("Internal server error", { status: 500 });
     }
 }
 
 export async function DELETE(
     req: Request,
-    { params }: { params: Promise<{ rideId: string }> }
+    { params }: { params: Promise<{ tripId: string }> }
 ) {
-    const { rideId } = await params;
+    const { tripId } = await params;
     try {
         const user = await getCurrentUser();
         if (!user) return new NextResponse("Unauthorized", { status: 401 });
 
-        const ride = await prisma.ride.findUnique({
-            where: { id: rideId },
+        const trip = await prisma.trip.findUnique({
+            where: { id: tripId },
             select: { creatorId: true, title: true, groupId: true }
         });
 
-        if (!ride) return new NextResponse("Trip not found", { status: 404 });
+        if (!trip) return new NextResponse("Trip not found", { status: 404 });
 
         const isPlatformAdmin = user.role === "PLATFORM_ADMIN";
 
-        if (ride.creatorId !== user.id && !isPlatformAdmin) {
+        if (trip.creatorId !== user.id && !isPlatformAdmin) {
             const membership = await prisma.membership.findUnique({
                 where: {
                     userId_groupId: {
                         userId: user.id,
-                        groupId: ride.groupId
+                        groupId: trip.groupId
                     }
                 }
             });
@@ -213,7 +213,7 @@ export async function DELETE(
 
         // NOTIFICATION: Notify all RSVP'd participants about the cancellation BEFORE deleting
         const rsvps = await prisma.rSVP.findMany({
-            where: { rideId, status: "CONFIRMED" },
+            where: { tripId, status: "CONFIRMED" },
             select: { userId: true }
         });
 
@@ -224,26 +224,26 @@ export async function DELETE(
                     userId: p.userId,
                     type: "RIDE_CANCEL",
                     title: "Trip Cancelled",
-                    message: `The trip "${ride.title}" has been cancelled.`,
-                    relatedId: ride.groupId, // Link back to group since ride is gone
+                    message: `The trip "${trip.title}" has been cancelled.`,
+                    relatedId: trip.groupId, // Link back to group since trip is gone
                 })),
             });
         }
 
         await prisma.$transaction([
-            // Clear notifications for this ride
+            // Clear notifications for this trip
             prisma.notification.deleteMany({
-                where: { relatedId: rideId }
+                where: { relatedId: tripId }
             }),
-            // Delete the ride (cascades will handle RSVPs and messages)
-            prisma.ride.delete({
-                where: { id: rideId },
+            // Delete the trip (cascades will handle RSVPs and messages)
+            prisma.trip.delete({
+                where: { id: tripId },
             }),
         ]);
 
         return new NextResponse(null, { status: 204 });
     } catch (error) {
-        console.error("RIDE_DELETE_ERROR", error);
+        console.error("TRIP_DELETE_ERROR", error);
         return new NextResponse("Internal server error", { status: 500 });
     }
 }

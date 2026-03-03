@@ -89,9 +89,12 @@ export default function NotificationsPage() {
                 return `/groups/${relatedId}`;
             case "RIDE_UPDATE":
             case "RIDE_NEW":
+            case "TRIP_UPDATE":
+            case "TRIP_NEW":
             case "MESSAGE":
             case "RIDE_CANCEL":
-                return `/rides/${relatedId}`;
+            case "TRIP_CANCEL":
+                return `/trips/${relatedId}`;
             default:
                 return null;
         }
@@ -112,7 +115,7 @@ export default function NotificationsPage() {
                 <div className="flex items-center justify-between mb-12">
                     <div>
                         <h1 className="text-4xl font-black mb-2 tracking-tight">Notifications</h1>
-                        <p className="text-zinc-400">Stay updated on your rides and groups.</p>
+                        <p className="text-zinc-400">Stay updated on your trips and groups.</p>
                     </div>
                     <div className="h-12 w-12 bg-zinc-900 rounded-2xl flex items-center justify-center ring-1 ring-zinc-800">
                         <Bell className="h-6 w-6 text-zinc-400" />

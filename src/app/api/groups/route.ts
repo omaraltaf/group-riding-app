@@ -91,7 +91,7 @@ export async function GET() {
                         memberships: {
                             where: { status: "APPROVED" },
                         },
-                        rides: true,
+                        trips: true,
                     },
                 },
             },

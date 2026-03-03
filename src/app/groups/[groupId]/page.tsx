@@ -57,10 +57,10 @@ interface Group {
     myStatus: string;
     status: string;
     memberships: Member[];
-    rides: Trip[];
+    trips: Trip[];
     _count: {
         memberships: number;
-        rides: number;
+        trips: number;
     };
 }
 
@@ -69,7 +69,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
     const router = useRouter();
     const [group, setGroup] = useState<Group | null>(null);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState("rides");
+    const [activeTab, setActiveTab] = useState("trips");
     const [copied, setCopied] = useState(false);
     const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
     const [showApprovalConfirm, setShowApprovalConfirm] = useState(false);
@@ -289,12 +289,12 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                         {/* Tabs */}
                         <div className="flex items-center gap-8 border-b border-zinc-800 mb-6 px-2">
                             <button
-                                onClick={() => setActiveTab("rides")}
-                                className={`pb-4 text-sm font-semibold transition-all relative ${activeTab === "rides" ? "text-orange-500" : "text-zinc-500 hover:text-zinc-300"
+                                onClick={() => setActiveTab("trips")}
+                                className={`pb-4 text-sm font-semibold transition-all relative ${activeTab === "trips" ? "text-orange-500" : "text-zinc-500 hover:text-zinc-300"
                                     }`}
                             >
-                                Trips ({group.rides?.length || 0})
-                                {activeTab === "rides" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>}
+                                Trips ({group.trips?.length || 0})
+                                {activeTab === "trips" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>}
                             </button>
                             <button
                                 onClick={() => setActiveTab("members")}
@@ -318,41 +318,41 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
 
                         {/* Tab Content */}
                         <div className="space-y-4">
-                            {activeTab === "rides" && (
+                            {activeTab === "trips" && (
                                 <>
                                     <div className="flex justify-between items-center mb-6">
                                         <h3 className="text-xl font-semibold">Upcoming Trips</h3>
                                         {group.isAdmin && (
                                             <Link
-                                                href={`/groups/${group.id}/rides/create`}
+                                                href={`/groups/${group.id}/trips/create`}
                                                 className="flex items-center gap-2 rounded-lg bg-zinc-800 px-3 py-1.5 text-xs font-bold hover:bg-zinc-700 transition-colors"
                                             >
                                                 <Plus className="h-3 w-3" /> New Trip
                                             </Link>
                                         )}
                                     </div>
-                                    {group.rides?.length === 0 ? (
+                                    {group.trips?.length === 0 ? (
                                         <div className="p-12 text-center bg-zinc-900 rounded-3xl ring-1 ring-zinc-800">
                                             <Calendar className="h-10 w-10 text-zinc-700 mx-auto mb-4" />
                                             <p className="text-zinc-500">No trips planned yet.</p>
                                         </div>
                                     ) : (
-                                        (group.rides || []).map((ride: any) => (
+                                        (group.trips || []).map((trip: any) => (
                                             <Link
-                                                key={ride.id}
-                                                href={`/rides/${ride.id}`}
+                                                key={trip.id}
+                                                href={`/trips/${trip.id}`}
                                                 className="p-4 bg-zinc-900 rounded-2xl ring-1 ring-zinc-800 hover:ring-orange-500/30 transition-all flex justify-between items-center group cursor-pointer block"
                                             >
                                                 <div className="flex gap-4">
                                                     <div className="h-12 w-12 bg-zinc-800 rounded-xl flex flex-col items-center justify-center font-bold text-xs">
-                                                        <span>{new Date(ride.startTime).toLocaleString('en-US', { month: 'short' }).toUpperCase()}</span>
-                                                        <span className="text-lg leading-none">{new Date(ride.startTime).getDate()}</span>
+                                                        <span>{new Date(trip.startTime).toLocaleString('en-US', { month: 'short' }).toUpperCase()}</span>
+                                                        <span className="text-lg leading-none">{new Date(trip.startTime).getDate()}</span>
                                                     </div>
                                                     <div>
-                                                        <h4 className="font-bold group-hover:text-orange-500 transition-colors uppercase tracking-tight">{ride.title}</h4>
+                                                        <h4 className="font-bold group-hover:text-orange-500 transition-colors uppercase tracking-tight">{trip.title}</h4>
                                                         <div className="flex items-center gap-3 text-xs text-zinc-500 mt-1">
-                                                            <span className="flex items-center gap-1"><MapPin className="h-3 w-3 text-orange-600" /> {ride.meetingPoint || "TBD"}</span>
-                                                            <span className="flex items-center gap-1"><Clock className="h-3 w-3 text-orange-600" /> {new Date(ride.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                            <span className="flex items-center gap-1"><MapPin className="h-3 w-3 text-orange-600" /> {trip.meetingPoint || "TBD"}</span>
+                                                            <span className="flex items-center gap-1"><Clock className="h-3 w-3 text-orange-600" /> {new Date(trip.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                                         </div>
                                                     </div>
                                                 </div>

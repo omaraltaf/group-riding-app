@@ -47,11 +47,11 @@ export async function POST(
             meetingPointUrl,
         } = body;
 
-        const rideStartTime = startTime ? new Date(startTime) : new Date();
-        const rideEndTime = endTime ? new Date(endTime) : null;
+        const tripStartTime = startTime ? new Date(startTime) : new Date();
+        const tripEndTime = endTime ? new Date(endTime) : null;
 
         // Basic validation to prevent 500 errors
-        if (rideStartTime.toString() === "Invalid Date") {
+        if (tripStartTime.toString() === "Invalid Date") {
             return new NextResponse("Invalid start time", { status: 400 });
         }
 
@@ -60,12 +60,12 @@ export async function POST(
             return new NextResponse("Invalid participant capacity", { status: 400 });
         }
 
-        const ride = await prisma.ride.create({
+        const trip = await prisma.trip.create({
             data: {
-                title: title || "New Ride",
+                title: title || "New Trip",
                 description: description || "",
-                startTime: rideStartTime,
-                endTime: rideEndTime,
+                startTime: tripStartTime,
+                endTime: tripEndTime,
                 meetingPoint: meetingPoint || "",
                 itinerary: itinerary || "",
                 terrainDifficulty: terrainDifficulty || "Medium",
@@ -83,7 +83,7 @@ export async function POST(
             }
         });
 
-        // NOTIFICATION: Notify all group members about the new ride
+        // NOTIFICATION: Notify all group members about the new trip
         const members = await prisma.membership.findMany({
             where: {
                 groupId: groupId,
@@ -99,15 +99,15 @@ export async function POST(
                     userId: m.userId,
                     type: "RIDE_NEW",
                     title: "New Trip Scheduled!",
-                    message: `${user.name} posted a new trip: "${title}" in "${(ride as any).group.name}".`,
-                    relatedId: ride.id,
+                    message: `${user.name} posted a new trip: "${title}" in "${(trip as any).group.name}".`,
+                    relatedId: trip.id,
                 })),
             });
         }
 
-        return NextResponse.json(ride);
+        return NextResponse.json(trip);
     } catch (error) {
-        console.error("RIDE_CREATE_ERROR", error);
+        console.error("TRIP_CREATE_ERROR", error);
         return new NextResponse("Internal server error", { status: 500 });
     }
 }
@@ -118,7 +118,7 @@ export async function GET(
 ) {
     const { groupId } = await params;
     try {
-        const rides = await prisma.ride.findMany({
+        const trips = await prisma.trip.findMany({
             where: { groupId: groupId },
             orderBy: { startTime: "asc" },
             include: {
@@ -128,9 +128,9 @@ export async function GET(
             }
         });
 
-        return NextResponse.json(rides);
+        return NextResponse.json(trips);
     } catch (error) {
-        console.error("RIDES_GET_ERROR", error);
+        console.error("TRIPS_GET_ERROR", error);
         return new NextResponse("Internal server error", { status: 500 });
     }
 }

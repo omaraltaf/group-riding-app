@@ -54,7 +54,7 @@ export default function DiscoveryPage() {
                 params.append("cursor", nextCursor);
             }
 
-            const res = await fetch(`/api/rides/discovery?${params.toString()}`);
+            const res = await fetch(`/api/trips/discovery?${params.toString()}`);
             if (res.status === 401) {
                 window.location.href = "/login";
                 return;
@@ -129,7 +129,7 @@ export default function DiscoveryPage() {
                             {trips.map(trip => (
                                 <Link
                                     key={trip.id}
-                                    href={`/rides/${trip.id}`}
+                                    href={`/trips/${trip.id}`}
                                     className="group relative bg-zinc-900 rounded-[2.5rem] overflow-hidden ring-1 ring-zinc-800 hover:ring-orange-500/50 transition-all shadow-2xl hover:-translate-y-1"
                                 >
                                     <div className="h-48 bg-zinc-800 relative">

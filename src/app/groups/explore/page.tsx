@@ -12,7 +12,7 @@ interface Group {
     myRole: string | null;
     _count: {
         memberships: number;
-        rides: number;
+        trips: number;
     };
 }
 
@@ -105,7 +105,7 @@ export default function ExploreGroupsPage() {
                                         </div>
                                         <div className="flex items-center gap-2 text-zinc-400 text-sm">
                                             <Clock className="h-4 w-4" />
-                                            <span>{group._count.rides} Trips</span>
+                                            <span>{group._count.trips} Trips</span>
                                         </div>
                                         {group.myStatus && (
                                             <div className="flex items-center gap-2 text-emerald-500 text-sm font-bold">

@@ -14,15 +14,17 @@ async function listForUrl(url: string, label: string) {
     try {
         const userCount = await prisma.user.count();
         const groupCount = await prisma.group.count();
-        const rideCount = await prisma.ride.count();
+        const tripCount = await prisma.trip.count();
 
-        console.log(`Summary: Users: ${userCount}, Groups: ${groupCount}, Rides: ${rideCount}`);
+        console.log(`Summary: Users: ${userCount}, Groups: ${groupCount}, Trips: ${tripCount}`);
 
+        console.log("\nGroups:");
         const groups = await prisma.group.findMany({ take: 5 });
         groups.forEach(g => console.log(`- Group: ${g.name}`));
 
-        const rides = await prisma.ride.findMany({ take: 5 });
-        rides.forEach(r => console.log(`- Ride: ${r.title}`));
+        console.log("\nTrips:");
+        const trips = await prisma.trip.findMany({ take: 5 });
+        trips.forEach(t => console.log(`- Trip: ${t.title}`));
 
     } catch (err: any) {
         console.error(`Error: ${err.message}`);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, use } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import {
     ChevronLeft,
@@ -13,15 +13,19 @@ import {
     Car,
     Users,
     Globe,
-    Lock
+    Lock,
+    Trash2
 } from "lucide-react";
 import Link from "next/link";
 import AddressAutocomplete from "@/components/address-autocomplete";
 
-export default function CreateTripPage({ params }: { params: Promise<{ groupId: string }> }) {
-    const { groupId } = use(params);
+export default function EditTripPage({ params }: { params: Promise<{ tripId: string }> }) {
+    const { tripId } = use(params);
     const router = useRouter();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -37,37 +41,101 @@ export default function CreateTripPage({ params }: { params: Promise<{ groupId: 
         isPublic: false,
     });
 
+    useEffect(() => {
+        fetch(`/api/trips/${tripId}`)
+            .then(res => res.json())
+            .then(data => {
+                // Formatting datetime-local value (YYYY-MM-DDTHH:mm)
+                const date = new Date(data.startTime);
+                const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+
+                setFormData({
+                    title: data.title || "",
+                    description: data.description || "",
+                    startTime: localDate,
+                    meetingPoint: data.meetingPoint || "",
+                    meetingPointUrl: data.meetingPointUrl || "",
+                    destination: data.destination || "",
+                    destinationUrl: data.destinationUrl || "",
+                    itinerary: data.itinerary || "",
+                    terrainDifficulty: data.terrainDifficulty || "Easy",
+                    suitableVehicles: data.suitableVehicles || "",
+                    participantCap: data.participantCap?.toString() || "",
+                    isPublic: data.isPublic || false,
+                });
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error(err);
+                setLoading(false);
+            });
+    }, [tripId]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
+        setSaving(true);
 
         try {
-            const res = await fetch(`/api/groups/${groupId}/rides`, {
-                method: "POST",
+            const res = await fetch(`/api/trips/${tripId}`, {
+                method: "PATCH",
                 body: JSON.stringify(formData),
                 headers: { "Content-Type": "application/json" },
             });
 
             if (res.ok) {
-                router.push(`/groups/${groupId}`);
+                router.push(`/trips/${tripId}`);
             }
         } catch (err) {
             console.error(err);
         } finally {
-            setLoading(false);
+            setSaving(false);
         }
     };
+
+    const handleDelete = async () => {
+        if (!confirm("Are you sure you want to delete this trip? This action cannot be undone.")) return;
+
+        setDeleting(true);
+        try {
+            const res = await fetch(`/api/trips/${tripId}`, {
+                method: "DELETE",
+            });
+
+            if (res.ok) {
+                router.push("/dashboard"); // Or back to group if we had groupId handy
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-zinc-950">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent"></div>
+            </div>
+        );
+    }
 
     return (
         <main className="min-h-screen bg-zinc-950 text-white pb-20">
             <nav className="border-b border-zinc-800 bg-zinc-950/50 backdrop-blur-md px-6 py-4 sticky top-0 z-50">
                 <div className="mx-auto max-w-3xl flex items-center justify-between">
-                    <Link href={`/groups/${groupId}`} className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
+                    <Link href={`/trips/${tripId}`} className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
                         <ChevronLeft className="h-5 w-5" />
-                        <span>Back to Group</span>
+                        <span>Back to Trip</span>
                     </Link>
-                    <h1 className="text-xl font-bold">New Trip</h1>
-                    <div className="w-20"></div>
+                    <h1 className="text-xl font-bold">Edit Trip</h1>
+                    <button
+                        onClick={handleDelete}
+                        disabled={deleting}
+                        className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Delete Trip"
+                    >
+                        <Trash2 className="h-5 w-5" />
+                    </button>
                 </div>
             </nav>
 
@@ -202,7 +270,7 @@ export default function CreateTripPage({ params }: { params: Promise<{ groupId: 
                                 value={formData.suitableVehicles}
                                 onChange={(e) => setFormData({ ...formData, suitableVehicles: e.target.value })}
                                 className="w-full rounded-2xl bg-zinc-800 border-0 py-4 px-5 text-white ring-1 ring-zinc-700 focus:ring-2 focus:ring-orange-500 transition-all"
-                                placeholder="e.g. Bikes, Cars, SUVs, 4x4s, Any"
+                                placeholder="e.g. Adventure, Sport, SUV, Any"
                             />
                         </div>
                     </section>
@@ -232,17 +300,17 @@ export default function CreateTripPage({ params }: { params: Promise<{ groupId: 
 
                     <div className="flex justify-end gap-4">
                         <Link
-                            href={`/groups/${groupId}`}
+                            href={`/trips/${tripId}`}
                             className="rounded-xl bg-zinc-900 px-8 py-4 font-semibold text-zinc-400 hover:bg-zinc-800 transition-all"
                         >
                             Cancel
                         </Link>
                         <button
                             type="submit"
-                            disabled={loading}
+                            disabled={saving}
                             className="flex items-center gap-2 rounded-xl bg-orange-600 px-10 py-4 font-semibold text-white shadow-xl hover:bg-orange-500 transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
                         >
-                            <Save className="h-5 w-5" /> {loading ? "Creating..." : "Create Trip"}
+                            <Save className="h-5 w-5" /> {saving ? "Saving..." : "Save Changes"}
                         </button>
                     </div>
                 </form>

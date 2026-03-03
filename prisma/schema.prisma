@@ -7,41 +7,63 @@ datasource db {
   provider = "postgresql"
 }
 
+enum UserRole {
+  PARTICIPANT
+  PLATFORM_ADMIN
+  RIDER
+}
+
+enum JoinPolicy {
+  OPEN
+  REQUEST_ONLY
+  PUBLIC
+  PRIVATE
+}
+
+enum RSVPStatus {
+  PENDING
+  CONFIRMED
+  DECLINED
+  APPROVED
+  INTERESTED
+  MAYBE
+}
+
 model User {
-  id               String         @id @default(cuid())
-  email            String?        @unique
-  password         String?
-  phone            String?        @unique
-  name             String?
-  image            String?
+  id                String         @id @default(cuid())
+  email             String?        @unique
+  password          String?
+  phone             String?        @unique
+  name              String?
+  image             String?
+  role              UserRole       @default(PARTICIPANT)
   vehicleExperience String?
-  vehicleTypes     String?
-  role             String         @default("PARTICIPANT")
-  pushOptIn        Boolean        @default(false)
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  createdGroups    Group[]        @relation("GroupCreator")
-  memberships      Membership[]
-  messages         Message[]
-  notifications    Notification[]
-  rsvps            RSVP[]
-  createdRides     Ride[]         @relation("RideCreator")
+  vehicleTypes      String?
+  pushOptIn         Boolean        @default(false)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  memberships       Membership[]
+  createdGroups     Group[]        @relation("GroupCreator")
+  rsvps             RSVP[]
+  messages          Message[]
+  createdTrips      Trip[]         @relation("TripCreator")
+  notifications     Notification[]
 }
 
 model Group {
-  id          String       @id @default(cuid())
-  name        String
-  description String?
-  image       String?
-  joinPolicy  String       @default("OPEN")
-  inviteCode  String?      @unique
-  creatorId   String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  status      String       @default("PENDING")
-  creator     User         @relation("GroupCreator", fields: [creatorId], references: [id])
-  memberships Membership[]
-  rides       Ride[]
+  id            String         @id @default(cuid())
+  name          String
+  description   String?
+  image         String?
+  joinPolicy    JoinPolicy     @default(OPEN)
+  inviteCode    String?        @unique
+  status        String         @default("PENDING")
+  creator       User           @relation("GroupCreator", fields: [creatorId], references: [id])
+  creatorId     String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  memberships   Membership[]
+  trips         Trip[]
 }
 
 model Membership {
@@ -61,30 +83,30 @@ model Membership {
   @@index([status])
 }
 
-model Ride {
-  id                String    @id @default(cuid())
+model Trip {
+  id                String         @id @default(cuid())
   title             String
   description       String?
   startTime         DateTime
   endTime           DateTime?
-  meetingPoint      String?
+  meetingPoint      String
   meetingPointUrl   String?
   destination       String?
+  destinationUrl    String?
   itinerary         String?
-  terrainDifficulty String    @default("Easy")
+  terrainDifficulty String?
   suitableVehicles  String?
   participantCap    Int?
-  status            String    @default("UPCOMING")
-  isPublic          Boolean   @default(true)
+  isPublic          Boolean        @default(true)
+  status            String         @default("UPCOMING")
+  group             Group          @relation(fields: [groupId], references: [id], onDelete: Cascade)
   groupId           String
+  creator           User           @relation("TripCreator", fields: [creatorId], references: [id])
   creatorId         String
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  destinationUrl    String?
-  messages          Message[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
   rsvps             RSVP[]
-  creator           User      @relation("RideCreator", fields: [creatorId], references: [id])
-  group             Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  messages          Message[]
 
   @@index([groupId])
   @@index([creatorId])
@@ -94,30 +116,29 @@ model Ride {
 }
 
 model RSVP {
-  id        String   @id @default(cuid())
-  status    String   @default("CONFIRMED")
+  id        String     @id @default(cuid())
+  status    RSVPStatus @default(PENDING)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  rideId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  ride      Ride     @relation(fields: [rideId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id])
+  trip      Trip       @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  tripId    String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
-  @@unique([userId, rideId])
+  @@unique([userId, tripId])
 }
 
 model Message {
   id        String   @id @default(cuid())
   content   String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  rideId    String
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  tripId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  ride      Ride     @relation(fields: [rideId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
-  @@index([rideId])
   @@index([createdAt])
 }
 

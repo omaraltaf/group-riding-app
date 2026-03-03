@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
             where.startTime = { gte: new Date() };
         }
 
-        const trips = await prisma.ride.findMany({
+        const trips = await prisma.trip.findMany({
             where,
             select: {
                 id: true,

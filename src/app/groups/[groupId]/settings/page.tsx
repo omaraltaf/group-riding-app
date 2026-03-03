@@ -79,7 +79,7 @@ export default function GroupSettingsPage({ params }: { params: Promise<{ groupI
     };
 
     const handleDelete = async () => {
-        if (!confirm("CRITICAL: Are you sure you want to delete this group? This action cannot be undone and will delete all rides and member data associated with it.")) return;
+        if (!confirm("CRITICAL: Are you sure you want to delete this group? This action cannot be undone and will delete all trips and member data associated with it.")) return;
 
         setDeleting(true);
         try {
@@ -127,8 +127,8 @@ export default function GroupSettingsPage({ params }: { params: Promise<{ groupI
                 <form onSubmit={handleSubmit} className="space-y-8">
                     {message.text && (
                         <div className={`rounded-xl p-4 text-sm font-medium ring-1 transition-all ${message.type === "success"
-                                ? "bg-emerald-500/10 text-emerald-500 ring-emerald-500/20"
-                                : "bg-red-500/10 text-red-500 ring-red-500/20"
+                            ? "bg-emerald-500/10 text-emerald-500 ring-emerald-500/20"
+                            : "bg-red-500/10 text-red-500 ring-red-500/20"
                             }`}>
                             {message.text}
                         </div>
@@ -174,8 +174,8 @@ export default function GroupSettingsPage({ params }: { params: Promise<{ groupI
                                 type="button"
                                 onClick={() => setFormData({ ...formData, joinPolicy: "OPEN" })}
                                 className={`p-6 rounded-2xl border-2 transition-all text-left group ${formData.joinPolicy === "OPEN"
-                                        ? "border-orange-500 bg-orange-500/5"
-                                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                    ? "border-orange-500 bg-orange-500/5"
+                                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                     }`}
                             >
                                 <Users className={`h-6 w-6 mb-3 ${formData.joinPolicy === "OPEN" ? "text-orange-500" : "text-zinc-500"}`} />
@@ -187,8 +187,8 @@ export default function GroupSettingsPage({ params }: { params: Promise<{ groupI
                                 type="button"
                                 onClick={() => setFormData({ ...formData, joinPolicy: "REQUEST_ONLY" })}
                                 className={`p-6 rounded-2xl border-2 transition-all text-left group ${formData.joinPolicy === "REQUEST_ONLY"
-                                        ? "border-orange-500 bg-orange-500/5"
-                                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                    ? "border-orange-500 bg-orange-500/5"
+                                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                     }`}
                             >
                                 <Lock className={`h-6 w-6 mb-3 ${formData.joinPolicy === "REQUEST_ONLY" ? "text-orange-500" : "text-zinc-500"}`} />

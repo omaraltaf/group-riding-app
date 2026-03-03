@@ -37,7 +37,7 @@ async function cleanup() {
             include: {
                 _count: {
                     select: {
-                        rides: true,
+                        trips: true,
                         memberships: true
                     }
                 }
@@ -51,12 +51,12 @@ async function cleanup() {
 
         console.log(`Found ${groupsToDelete.length} groups to remove:`);
         for (const g of groupsToDelete) {
-            console.log(`- ${g.name} (${g.id}): ${g._count.rides} rides, ${g._count.memberships} memberships`);
+            console.log(`- ${g.name} (${g.id}): ${g._count.trips} trips, ${g._count.memberships} memberships`);
         }
 
         console.log("\nExecuting deletion...");
 
-        // Deleting the group will trigger cascading deletes for memberships and rides
+        // Deleting the group will trigger cascading deletes for memberships and trips
         const deleteResult = await prisma.group.deleteMany({
             where: {
                 id: {
@@ -66,7 +66,7 @@ async function cleanup() {
         });
 
         console.log(`✅ Successfully deleted ${deleteResult.count} groups.`);
-        console.log("Cascading deletes should have removed all associated rides, memberships, RSVPs, and messages.");
+        console.log("Cascading deletes should have removed all associated trips, memberships, RSVPs, and messages.");
 
     } catch (err) {
         console.error("❌ Cleanup failed:", err);

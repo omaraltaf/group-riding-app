@@ -19,7 +19,7 @@ async function run() {
         await sql`DELETE FROM "Notification"`;
         await sql`DELETE FROM "Message"`;
         await sql`DELETE FROM "RSVP"`;
-        await sql`DELETE FROM "Ride"`;
+        await sql`DELETE FROM "Trip"`;
         await sql`DELETE FROM "Membership"`;
         await sql`DELETE FROM "Group"`;
         await sql`DELETE FROM "User"`;
@@ -39,12 +39,12 @@ async function run() {
 
         await sql`
             INSERT INTO "User" (id, email, password, name, role, "vehicleExperience", "vehicleTypes", "createdAt", "updatedAt") 
-            VALUES (${member1Id}, 'omar@example.com', ${hMemberPw}, 'Omar Altaf', 'PARTICIPANT', 'Advanced', 'SUV, 4x4', NOW(), NOW())
+            VALUES (${member1Id}, 'omar@example.com', ${hMemberPw}, 'Omar Altaf', 'RIDER', 'Advanced', 'SUV, 4x4', NOW(), NOW())
         `;
 
         await sql`
             INSERT INTO "User" (id, email, password, name, role, "vehicleExperience", "vehicleTypes", "createdAt", "updatedAt") 
-            VALUES (${member2Id}, 'sarah@example.com', ${hMemberPw}, 'Sarah Explorer', 'PARTICIPANT', 'Intermediate', 'Motorcycle', NOW(), NOW())
+            VALUES (${member2Id}, 'sarah@example.com', ${hMemberPw}, 'Sarah Explorer', 'RIDER', 'Intermediate', 'Motorcycle', NOW(), NOW())
         `;
 
         const group1Id = nanoid();
@@ -68,28 +68,28 @@ async function run() {
         await sql`INSERT INTO "Membership" (id, role, status, "userId", "groupId", "createdAt", "updatedAt") VALUES (${nanoid()}, 'MEMBER', 'APPROVED', ${member1Id}, ${group1Id}, NOW(), NOW())`;
         await sql`INSERT INTO "Membership" (id, role, status, "userId", "groupId", "createdAt", "updatedAt") VALUES (${nanoid()}, 'ADMIN', 'APPROVED', ${member1Id}, ${group2Id}, NOW(), NOW())`;
 
-        // Rides
+        // Trips
         console.log("Inserting trips...");
-        const ride1Id = nanoid();
-        const ride2Id = nanoid();
+        const trip1Id = nanoid();
+        const trip2Id = nanoid();
         await sql`
-            INSERT INTO "Ride" (id, title, description, "startTime", "meetingPoint", "terrainDifficulty", "suitableVehicles", "participantCap", "isPublic", "groupId", "creatorId", "createdAt", "updatedAt") 
-            VALUES (${ride1Id}, 'Black Forest Sunrise', 'Epic morning climb for all vehicle types.', ${new Date(Date.now() + 24 * 3600 * 1000)}, 'Central Hub Fountain', 'Challenging', 'Any', 15, true, ${group1Id}, ${adminId}, NOW(), NOW())
+            INSERT INTO "Trip" (id, title, description, "startTime", "meetingPoint", "terrainDifficulty", "suitableVehicles", "participantCap", "isPublic", "groupId", "creatorId", "createdAt", "updatedAt") 
+            VALUES (${trip1Id}, 'Black Forest Sunrise', 'Epic morning climb for all vehicle types.', ${new Date(Date.now() + 24 * 3600 * 1000)}, 'Central Hub Fountain', 'Challenging', 'Any', 15, true, ${group1Id}, ${adminId}, NOW(), NOW())
         `;
 
         await sql`
-            INSERT INTO "Ride" (id, title, description, "startTime", "meetingPoint", "terrainDifficulty", "suitableVehicles", "participantCap", "isPublic", "groupId", "creatorId", "createdAt", "updatedAt") 
-            VALUES (${ride2Id}, 'Beach Road Coffee Run', 'Chill 30km flat drive. Suitable for Sedans.', ${new Date(Date.now() + 168 * 3600 * 1000)}, 'North Pier Entrance', 'Easy', 'Cars, SUVs', 25, true, ${group2Id}, ${member1Id}, NOW(), NOW())
+            INSERT INTO "Trip" (id, title, description, "startTime", "meetingPoint", "terrainDifficulty", "suitableVehicles", "participantCap", "isPublic", "groupId", "creatorId", "createdAt", "updatedAt") 
+            VALUES (${trip2Id}, 'Beach Road Coffee Run', 'Chill 30km flat drive. Suitable for Sedans.', ${new Date(Date.now() + 168 * 3600 * 1000)}, 'North Pier Entrance', 'Easy', 'Cars, SUVs', 25, true, ${group2Id}, ${member1Id}, NOW(), NOW())
         `;
 
         // RSVPs
         console.log("Inserting RSVPs...");
-        await sql`INSERT INTO "RSVP" (id, status, "userId", "rideId", "createdAt", "updatedAt") VALUES (${nanoid()}, 'CONFIRMED', ${adminId}, ${ride1Id}, NOW(), NOW())`;
-        await sql`INSERT INTO "RSVP" (id, status, "userId", "rideId", "createdAt", "updatedAt") VALUES (${nanoid()}, 'CONFIRMED', ${member1Id}, ${ride1Id}, NOW(), NOW())`;
+        await sql`INSERT INTO "RSVP" (id, status, "userId", "tripId", "createdAt", "updatedAt") VALUES (${nanoid()}, 'CONFIRMED', ${adminId}, ${trip1Id}, NOW(), NOW())`;
+        await sql`INSERT INTO "RSVP" (id, status, "userId", "tripId", "createdAt", "updatedAt") VALUES (${nanoid()}, 'CONFIRMED', ${member1Id}, ${trip1Id}, NOW(), NOW())`;
 
         // Messages
         console.log("Inserting messages...");
-        await sql`INSERT INTO "Message" (id, content, "userId", "rideId", "createdAt", "updatedAt") VALUES (${nanoid()}, 'Looking forward to this! Don''t forget your gear.', ${adminId}, ${ride1Id}, NOW(), NOW())`;
+        await sql`INSERT INTO "Message" (id, content, "userId", "tripId", "createdAt", "updatedAt") VALUES (${nanoid()}, 'Looking forward to this! Don''t forget your gear.', ${adminId}, ${trip1Id}, NOW(), NOW())`;
 
         console.log("Direct SQL Seeding completed successfully!");
     } catch (e) {

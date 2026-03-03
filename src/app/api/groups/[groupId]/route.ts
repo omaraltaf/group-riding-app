@@ -26,7 +26,7 @@ export async function GET(
                         },
                     },
                 },
-                rides: {
+                trips: {
                     orderBy: { startTime: "asc" },
                 },
             },
@@ -162,20 +162,20 @@ export async function DELETE(
             }
         }
 
-        // Get ride IDs for notification cleanup
-        const rides = await prisma.ride.findMany({
+        // Get trip IDs for notification cleanup
+        const trips = await prisma.trip.findMany({
             where: { groupId },
             select: { id: true },
         });
-        const rideIds = rides.map((r: any) => r.id);
+        const tripIds = trips.map((t: any) => t.id);
 
         await prisma.$transaction([
-            // Delete notifications related to this group or its rides
+            // Delete notifications related to this group or its trips
             prisma.notification.deleteMany({
                 where: {
                     OR: [
                         { relatedId: groupId },
-                        { relatedId: { in: rideIds } }
+                        { relatedId: { in: tripIds } }
                     ]
                 }
             }),

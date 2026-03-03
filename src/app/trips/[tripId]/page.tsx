@@ -32,7 +32,7 @@ interface RSVP {
     };
 }
 
-interface Ride {
+interface Trip {
     id: string;
     title: string;
     description: string;
@@ -57,9 +57,9 @@ interface Ride {
     myRsvp: string | null;
 }
 
-export default function RideDetailPage({ params }: { params: Promise<{ rideId: string }> }) {
-    const { rideId } = use(params);
-    const [ride, setRide] = useState<Ride | null>(null);
+export default function TripDetailPage({ params }: { params: Promise<{ tripId: string }> }) {
+    const { tripId } = use(params);
+    const [trip, setTrip] = useState<Trip | null>(null);
     const [loading, setLoading] = useState(true);
     const [rsvpLoading, setRsvpLoading] = useState(false);
 
@@ -71,15 +71,15 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
     const [sending, setSending] = useState(false);
 
     useEffect(() => {
-        fetch(`/api/rides/${rideId}`)
+        fetch(`/api/trips/${tripId}`)
             .then(async res => {
                 if (res.status === 401) {
                     window.location.href = "/login";
                     return;
                 }
-                if (!res.ok) throw new Error("Failed to fetch ride");
+                if (!res.ok) throw new Error("Failed to fetch trip");
                 const data = await res.json();
-                setRide(data);
+                setTrip(data);
                 setLoading(false);
             })
             .catch(err => {
@@ -87,7 +87,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                 setLoading(false);
             });
 
-        fetch(`/api/rides/${rideId}/messages`)
+        fetch(`/api/trips/${tripId}/messages`)
             .then(async res => {
                 if (res.status === 401) return;
                 if (!res.ok) throw new Error("Failed to fetch messages");
@@ -95,7 +95,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                 setMessages(Array.isArray(data) ? data : []);
             })
             .catch(err => console.error(err));
-    }, [rideId]);
+    }, [tripId]);
 
     const handleShare = () => {
         const url = window.location.href;
@@ -110,7 +110,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
 
         setSending(true);
         try {
-            const res = await fetch(`/api/rides/${rideId}/messages`, {
+            const res = await fetch(`/api/trips/${tripId}/messages`, {
                 method: "POST",
                 body: JSON.stringify({ content: newMessage }),
                 headers: { "Content-Type": "application/json" },
@@ -130,21 +130,21 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
     const handleRSVP = async (status: string) => {
         setRsvpLoading(true);
         try {
-            const res = await fetch(`/api/rides/${rideId}/rsvp`, {
+            const res = await fetch(`/api/trips/${tripId}/rsvp`, {
                 method: "POST",
                 body: JSON.stringify({ status }),
                 headers: { "Content-Type": "application/json" },
             });
             if (res.ok) {
                 const updatedRsvp = await res.json();
-                setRide(prev => {
+                setTrip(prev => {
                     if (!prev) return null;
                     return { ...prev, myRsvp: updatedRsvp.status };
                 });
                 // Refresh full data to show updated RSVP list
-                const refreshRes = await fetch(`/api/rides/${rideId}`);
+                const refreshRes = await fetch(`/api/trips/${tripId}`);
                 const refreshData = await refreshRes.json();
-                setRide(refreshData);
+                setTrip(refreshData);
             }
         } catch (err) {
             console.error(err);
@@ -161,17 +161,17 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
         );
     }
 
-    if (!ride) return null;
+    if (!trip) return null;
 
-    const confirmedCount = (ride.rsvps || []).filter(r => r.status === "CONFIRMED").length;
-    const isFull = ride.participantCap ? confirmedCount >= ride.participantCap : false;
+    const confirmedCount = (trip.rsvps || []).filter(r => r.status === "CONFIRMED").length;
+    const isFull = trip.participantCap ? confirmedCount >= trip.participantCap : false;
 
     return (
         <main className="min-h-screen bg-zinc-950 text-white pb-20">
             <div className="mx-auto max-w-5xl px-6 pt-12">
                 <div className="flex items-center gap-3 mb-8 text-zinc-400">
-                    <Link href={`/groups/${ride.groupId}`} className="hover:text-white transition-colors flex items-center gap-2">
-                        <ChevronLeft className="h-4 w-4" /> {ride.group.name}
+                    <Link href={`/groups/${trip.groupId}`} className="hover:text-white transition-colors flex items-center gap-2">
+                        <ChevronLeft className="h-4 w-4" /> {trip.group.name}
                     </Link>
                 </div>
 
@@ -179,28 +179,28 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                     <div className="lg:col-span-2 space-y-10">
                         <div>
                             <div className="flex items-center gap-2 mb-4">
-                                <span className={`px-3 py-1 rounded-full text-xs font-bold ring-1 ${ride.terrainDifficulty === "Expert" ? "bg-red-500/10 text-red-500 ring-red-500/20" :
-                                    ride.terrainDifficulty === "Challenging" ? "bg-orange-500/10 text-orange-500 ring-orange-500/20" :
+                                <span className={`px-3 py-1 rounded-full text-xs font-bold ring-1 ${trip.terrainDifficulty === "Expert" ? "bg-red-500/10 text-red-500 ring-red-500/20" :
+                                    trip.terrainDifficulty === "Challenging" ? "bg-orange-500/10 text-orange-500 ring-orange-500/20" :
                                         "bg-emerald-500/10 text-emerald-500 ring-emerald-500/20"
                                     }`}>
-                                    {ride.terrainDifficulty}
+                                    {trip.terrainDifficulty}
                                 </span>
-                                {ride.isPublic && (
+                                {trip.isPublic && (
                                     <span className="px-3 py-1 rounded-full text-xs font-bold bg-zinc-800 text-zinc-400 ring-1 ring-zinc-700">Public Trip</span>
                                 )}
                             </div>
                             <div className="flex items-center justify-between gap-4 mb-4">
-                                <h1 className="text-4xl font-black">{ride.title}</h1>
-                                {(ride.isAdmin || ride.isCreator) && (
+                                <h1 className="text-4xl font-black">{trip.title}</h1>
+                                {(trip.isAdmin || trip.isCreator) && (
                                     <Link
-                                        href={`/rides/${rideId}/edit`}
+                                        href={`/trips/${tripId}/edit`}
                                         className="shrink-0 flex items-center gap-2 px-6 py-3 rounded-xl bg-zinc-800 text-zinc-300 font-bold hover:bg-zinc-700 transition-all active:scale-95 ring-1 ring-zinc-700"
                                     >
                                         Edit Trip
                                     </Link>
                                 )}
                             </div>
-                            <p className="text-xl text-zinc-400 leading-relaxed">{ride.description}</p>
+                            <p className="text-xl text-zinc-400 leading-relaxed">{trip.description}</p>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-zinc-900 rounded-3xl p-8 ring-1 ring-zinc-800">
@@ -211,7 +211,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                                     </div>
                                     <div>
                                         <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider">Date</p>
-                                        <p className="font-semibold">{new Date(ride.startTime).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+                                        <p className="font-semibold">{new Date(trip.startTime).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-4">
@@ -220,7 +220,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                                     </div>
                                     <div>
                                         <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider">Start Time</p>
-                                        <p className="font-semibold">{new Date(ride.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                        <p className="font-semibold">{new Date(trip.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                                     </div>
                                 </div>
                             </div>
@@ -232,10 +232,10 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                                     <div>
                                         <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider">Meeting Point</p>
                                         <div className="flex flex-col">
-                                            <p className="font-semibold truncate max-w-[200px]">{ride.meetingPoint}</p>
-                                            {ride.meetingPointUrl && (
+                                            <p className="font-semibold truncate max-w-[200px]">{trip.meetingPoint}</p>
+                                            {trip.meetingPointUrl && (
                                                 <a
-                                                    href={ride.meetingPointUrl}
+                                                    href={trip.meetingPointUrl}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="text-[10px] text-orange-500 hover:underline flex items-center gap-1 mt-0.5"
@@ -252,10 +252,10 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                                     </div>
                                     <div>
                                         <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider">Capacity</p>
-                                        <p className="font-semibold">{ride.participantCap ? `${confirmedCount} / ${ride.participantCap} participants` : "Unlimited"}</p>
+                                        <p className="font-semibold">{trip.participantCap ? `${confirmedCount} / ${trip.participantCap} participants` : "Unlimited"}</p>
                                     </div>
                                 </div>
-                                {ride.destination && (
+                                {trip.destination && (
                                     <div className="flex items-start gap-4">
                                         <div className="h-10 w-10 bg-zinc-800 rounded-xl flex items-center justify-center shrink-0">
                                             <MapPin className="h-5 w-5 text-emerald-500" />
@@ -263,10 +263,10 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                                         <div>
                                             <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider">Destination</p>
                                             <div className="flex flex-col">
-                                                <p className="font-semibold truncate max-w-[200px]">{ride.destination}</p>
-                                                {ride.destinationUrl && (
+                                                <p className="font-semibold truncate max-w-[200px]">{trip.destination}</p>
+                                                {trip.destinationUrl && (
                                                     <a
-                                                        href={ride.destinationUrl}
+                                                        href={trip.destinationUrl}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="text-[10px] text-emerald-500 hover:underline flex items-center gap-1 mt-0.5"
@@ -335,7 +335,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                                 <MessageSquare className="h-5 w-5 text-orange-500" /> Itinerary
                             </h3>
                             <div className="p-8 bg-zinc-900 rounded-3xl ring-1 ring-zinc-800 whitespace-pre-wrap text-zinc-300 italic">
-                                {ride.itinerary || "Detailed itinerary hasn't been shared yet."}
+                                {trip.itinerary || "Detailed itinerary hasn't been shared yet."}
                             </div>
                         </div>
 
@@ -344,7 +344,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                                 <Users className="h-5 w-5 text-orange-500" /> Attending ({confirmedCount})
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {((ride.rsvps || []).filter(r => r.status === "CONFIRMED")).map(rsvp => (
+                                {((trip.rsvps || []).filter(r => r.status === "CONFIRMED")).map(rsvp => (
                                     <div key={rsvp.id} className="p-4 bg-zinc-900 rounded-2xl ring-1 ring-zinc-800 flex items-center gap-3">
                                         <div className="h-10 w-10 rounded-full bg-zinc-800 flex items-center justify-center">
                                             <Users className="h-5 w-5 text-zinc-600" />
@@ -363,7 +363,7 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                         <div className="p-8 bg-zinc-900 rounded-[2.5rem] ring-1 ring-zinc-800 shadow-2xl sticky top-24">
                             <h3 className="text-2xl font-black mb-6">Are you coming?</h3>
 
-                            {isFull && ride.myRsvp !== "CONFIRMED" && (
+                            {isFull && trip.myRsvp !== "CONFIRMED" && (
                                 <div className="mb-6 p-4 bg-red-500/10 rounded-2xl ring-1 ring-red-500/20 flex items-center gap-3 text-red-500 text-sm">
                                     <AlertTriangle className="h-5 w-5 shrink-0" />
                                     <p>This trip has reached its maximum capacity.</p>
@@ -373,38 +373,38 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                             <div className="space-y-3">
                                 <button
                                     onClick={() => handleRSVP("CONFIRMED")}
-                                    disabled={rsvpLoading || (isFull && ride.myRsvp !== "CONFIRMED")}
-                                    className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl font-bold transition-all ${ride.myRsvp === "CONFIRMED"
+                                    disabled={rsvpLoading || (isFull && trip.myRsvp !== "CONFIRMED")}
+                                    className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl font-bold transition-all ${trip.myRsvp === "CONFIRMED"
                                         ? "bg-emerald-600 text-white shadow-lg shadow-emerald-950/20"
                                         : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 disabled:opacity-50"
                                         }`}
                                 >
                                     <span>Confirm Attendance</span>
-                                    <CheckCircle2 className={`h-5 w-5 ${ride.myRsvp === "CONFIRMED" ? "text-emerald-200" : "text-zinc-600"}`} />
+                                    <CheckCircle2 className={`h-5 w-5 ${trip.myRsvp === "CONFIRMED" ? "text-emerald-200" : "text-zinc-600"}`} />
                                 </button>
 
                                 <button
                                     onClick={() => handleRSVP("MAYBE")}
                                     disabled={rsvpLoading}
-                                    className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl font-bold transition-all ${ride.myRsvp === "MAYBE"
+                                    className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl font-bold transition-all ${trip.myRsvp === "MAYBE"
                                         ? "bg-blue-600 text-white shadow-lg shadow-blue-950/20"
                                         : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                                         }`}
                                 >
                                     <span>Maybe</span>
-                                    <HelpCircle className={`h-5 w-5 ${ride.myRsvp === "MAYBE" ? "text-blue-200" : "text-zinc-600"}`} />
+                                    <HelpCircle className={`h-5 w-5 ${trip.myRsvp === "MAYBE" ? "text-blue-200" : "text-zinc-600"}`} />
                                 </button>
 
                                 <button
                                     onClick={() => handleRSVP("DECLINED")}
                                     disabled={rsvpLoading}
-                                    className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl font-bold transition-all ${ride.myRsvp === "DECLINED"
+                                    className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl font-bold transition-all ${trip.myRsvp === "DECLINED"
                                         ? "bg-red-600 text-white shadow-lg shadow-red-950/20"
                                         : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                                         }`}
                                 >
                                     <span>Can&apos;t Make It</span>
-                                    <XCircle className={`h-5 w-5 ${ride.myRsvp === "DECLINED" ? "text-red-200" : "text-zinc-600"}`} />
+                                    <XCircle className={`h-5 w-5 ${trip.myRsvp === "DECLINED" ? "text-red-200" : "text-zinc-600"}`} />
                                 </button>
                             </div>
 
@@ -413,13 +413,13 @@ export default function RideDetailPage({ params }: { params: Promise<{ rideId: s
                                     <div className="h-8 w-8 bg-zinc-800 rounded-lg flex items-center justify-center">
                                         <Trophy className="h-4 w-4 text-zinc-500" />
                                     </div>
-                                    <p className="text-sm text-zinc-400">Experience: <span className="text-white font-medium">{ride.terrainDifficulty}</span></p>
+                                    <p className="text-sm text-zinc-400">Experience: <span className="text-white font-medium">{trip.terrainDifficulty}</span></p>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="h-8 w-8 bg-zinc-800 rounded-lg flex items-center justify-center">
                                         <Car className="h-4 w-4 text-zinc-500" />
                                     </div>
-                                    <p className="text-sm text-zinc-400">Suitable for: <span className="text-white font-medium">{ride.suitableVehicles || "Any vehicle"}</span></p>
+                                    <p className="text-sm text-zinc-400">Suitable for: <span className="text-white font-medium">{trip.suitableVehicles || "Any vehicle"}</span></p>
                                 </div>
                             </div>
 

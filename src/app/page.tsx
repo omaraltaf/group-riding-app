@@ -38,10 +38,10 @@ export default async function Home() {
   const [groups, upcomingTrips] = await Promise.all([
     prisma.membership.findMany({
       where: { userId: user.id, status: "APPROVED" },
-      include: { group: { include: { _count: { select: { memberships: true, rides: true } } } } },
+      include: { group: { include: { _count: { select: { memberships: true, trips: true } } } } },
       take: 4,
     }),
-    prisma.ride.findMany({
+    prisma.trip.findMany({
       where: {
         isPublic: true,
         startTime: { gte: new Date() },
@@ -86,29 +86,29 @@ export default async function Home() {
                     <p className="text-zinc-500">No upcoming trips found. Check back later!</p>
                   </div>
                 ) : (
-                  upcomingTrips.map((ride: any) => (
+                  upcomingTrips.map((trip: any) => (
                     <Link
-                      key={ride.id}
-                      href={`/rides/${ride.id}`}
+                      key={trip.id}
+                      href={`/trips/${trip.id}`}
                       className="group relative overflow-hidden rounded-2xl bg-zinc-900 p-6 ring-1 ring-zinc-800 hover:ring-orange-500/50 transition-all cursor-pointer block"
                     >
                       <div className="flex justify-between items-start">
                         <div>
                           <span className="inline-flex items-center rounded-md bg-orange-500/10 px-2 py-1 text-[10px] font-black uppercase tracking-wider text-orange-500 ring-1 ring-inset ring-orange-500/20 mb-3">
-                            {ride.isPublic ? "Public" : "Group Only"}
+                            {trip.isPublic ? "Public" : "Group Only"}
                           </span>
-                          <h4 className="text-lg font-bold group-hover:text-orange-500 transition-colors uppercase tracking-tight">{ride.title}</h4>
-                          <p className="text-zinc-400 text-sm mt-1 font-medium">{ride.meetingPoint}</p>
+                          <h4 className="text-lg font-bold group-hover:text-orange-500 transition-colors uppercase tracking-tight">{trip.title}</h4>
+                          <p className="text-zinc-400 text-sm mt-1 font-medium">{trip.meetingPoint}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-black text-white">{new Date(ride.startTime).toLocaleString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()}</p>
-                          <p className="text-[10px] text-zinc-500 font-bold">{new Date(ride.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                          <p className="text-sm font-black text-white">{new Date(trip.startTime).toLocaleString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()}</p>
+                          <p className="text-[10px] text-zinc-500 font-bold">{new Date(trip.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                         </div>
                       </div>
                       <div className="mt-6 flex items-center justify-between">
                         <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                          <span className="flex items-center gap-1.5"><UsersIcon className="h-3.5 w-3.5 text-orange-600" /> {ride._count.rsvps} Participants</span>
-                          <span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5 text-orange-600" /> {ride.group.name}</span>
+                          <span className="flex items-center gap-1.5"><UsersIcon className="h-3.5 w-3.5 text-orange-600" /> {trip._count.rsvps} Participants</span>
+                          <span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5 text-orange-600" /> {trip.group.name}</span>
                         </div>
                         <ChevronRight className="h-5 w-5 text-zinc-600 group-hover:text-orange-500 group-hover:translate-x-1 transition-all" />
                       </div>
@@ -141,7 +141,7 @@ export default async function Home() {
                     >
                       <h4 className="font-bold group-hover:text-blue-400 transition-colors uppercase tracking-tight">{membership.group.name}</h4>
                       <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mt-2">
-                        {membership.group._count.memberships} members • {membership.group._count.rides} trips
+                        {membership.group._count.memberships} members • {membership.group._count.trips} trips
                       </p>
                     </Link>
                   ))

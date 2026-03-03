@@ -10,7 +10,7 @@ interface Group {
     description: string;
     _count: {
         memberships: number;
-        rides: number;
+        trips: number;
     };
 }
 
@@ -125,7 +125,7 @@ export default function GroupsPage() {
                                         </div>
                                         <div className="flex items-center gap-2 text-zinc-400 text-sm">
                                             <Clock className="h-4 w-4" />
-                                            <span>{group._count.rides} Trips</span>
+                                            <span>{group._count.trips} Trips</span>
                                         </div>
                                     </div>
 

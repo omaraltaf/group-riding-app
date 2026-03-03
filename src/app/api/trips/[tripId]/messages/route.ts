@@ -6,18 +6,18 @@ export const runtime = "nodejs";
 
 export async function POST(
     req: Request,
-    { params }: { params: Promise<{ rideId: string }> }
+    { params }: { params: Promise<{ tripId: string }> }
 ) {
-    const { rideId } = await params;
+    const { tripId } = await params;
     try {
         const user = await getCurrentUser();
         if (!user) return new NextResponse("Unauthorized", { status: 401 });
 
-        const ride = await prisma.ride.findUnique({
-            where: { id: rideId },
+        const trip = await prisma.trip.findUnique({
+            where: { id: tripId },
         });
 
-        if (!ride) return new NextResponse("Ride not found", { status: 404 });
+        if (!trip) return new NextResponse("Trip not found", { status: 404 });
 
         const body = await req.json();
         const { content } = body;
@@ -28,20 +28,20 @@ export async function POST(
             data: {
                 content,
                 userId: user.id,
-                rideId: rideId,
+                tripId: tripId,
             },
             include: {
                 user: {
                     select: { id: true, name: true, image: true }
                 },
-                ride: true,
+                trip: true,
             }
         });
 
         // NOTIFICATION: Notify all other RSVP'd participants about the new message
         const participants = await prisma.rSVP.findMany({
             where: {
-                rideId: rideId,
+                tripId: tripId,
                 status: { in: ["CONFIRMED", "INTERESTED"] },
                 userId: { not: user.id }, // Don't notify the sender
             },
@@ -53,9 +53,9 @@ export async function POST(
                 data: participants.map((p) => ({
                     userId: p.userId,
                     type: "MESSAGE",
-                    title: `New Message in ${message.ride.title}`,
+                    title: `New Message in ${(message as any).trip.title}`,
                     message: `${user.name}: ${content.substring(0, 50)}${content.length > 50 ? "..." : ""}`,
-                    relatedId: rideId,
+                    relatedId: tripId,
                 })),
             });
         }
@@ -69,12 +69,12 @@ export async function POST(
 
 export async function GET(
     req: Request,
-    { params }: { params: Promise<{ rideId: string }> }
+    { params }: { params: Promise<{ tripId: string }> }
 ) {
-    const { rideId } = await params;
+    const { tripId } = await params;
     try {
         const messages = await prisma.message.findMany({
-            where: { rideId: rideId },
+            where: { tripId: tripId },
             orderBy: { createdAt: "asc" },
             include: {
                 user: {
