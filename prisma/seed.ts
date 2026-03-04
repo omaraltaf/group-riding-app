@@ -48,10 +48,9 @@ async function main() {
 
         // Define groups
         const groupData = [
-            { name: "City Commuters", description: "Daily urban riders weaving through traffic.", joinPolicy: "PUBLIC" },
-            { name: "Weekend Explorers", description: "Finding the best scenic routes every Saturday.", joinPolicy: "PUBLIC" },
-            { name: "Road Warriors", description: "High-speed endurance focused group.", joinPolicy: "PUBLIC" },
-            { name: "Midnight Cruisers", description: "Late night rides under the city lights.", joinPolicy: "PRIVATE" },
+            { name: "City Commuters", description: "Daily urban participants weaving through traffic.", joinPolicy: "PUBLIC" },
+            { name: "Off-Road Warriors", description: "Dirt and gravel enthusiasts seeking rugged adventures.", joinPolicy: "REQUEST_ONLY" },
+            { name: "Midnight Cruisers", description: "Late night trips under the city lights.", joinPolicy: "PRIVATE" },
             { name: "Track Day Elite", description: "Professional-grade training and track sessions.", joinPolicy: "PRIVATE" },
         ];
 
