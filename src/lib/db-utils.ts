@@ -18,8 +18,8 @@ export function getConfiguredDatabaseUrl(rawUrl: string | undefined): string | u
     ];
 
     if (currentBranch && devBranches.includes(currentBranch)) {
-        // Replace the Neon host prefix (ep-*) with the development database host
-        url = url.replace(/ep-[^.]+/, 'ep-icy-darkness-aie1t3lq');
+        // Replace the Neon host prefix (ep-*) with the development database host, preserving -pooler suffix if present
+        url = url.replace(/ep-[a-z0-9-]+?(?=-pooler\.|\.|$)/, 'ep-icy-darkness-aie1t3lq');
     }
 
     // For migration scripts: automatically derive direct URL from pooled URL if needed
