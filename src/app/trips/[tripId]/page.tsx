@@ -16,7 +16,9 @@ import {
     Share2,
     AlertTriangle,
     Send as SendIcon,
-    ExternalLink
+    ExternalLink,
+    Mountain,
+    Globe,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -46,6 +48,7 @@ interface Trip {
     suitableVehicles: string;
     participantCap: number | null;
     isPublic: boolean;
+    category: string;
     groupId: string;
     group: {
         id: string;
@@ -184,6 +187,16 @@ export default function TripDetailPage({ params }: { params: Promise<{ tripId: s
                                         "bg-emerald-500/10 text-emerald-500 ring-emerald-500/20"
                                     }`}>
                                     {trip.terrainDifficulty}
+                                </span>
+                                <span className="px-3 py-1 rounded-full text-xs font-bold bg-orange-500/10 text-orange-500 ring-1 ring-orange-500/20 flex items-center gap-1.5">
+                                    {trip.category === "BIKES" && <Trophy className="h-3 w-3" />}
+                                    {trip.category === "CARS_4X4" && <Car className="h-3 w-3" />}
+                                    {trip.category === "CYCLING" && <ChevronLeft className="h-3 w-3" />}
+                                    {trip.category === "EXCURSIONS" && <MapPin className="h-3 w-3" />}
+                                    {trip.category === "BIKES" ? "Bike Trip" :
+                                        trip.category === "CARS_4X4" ? "Cars/4x4 Trip" :
+                                            trip.category === "CYCLING" ? "Cycling Trip" :
+                                                trip.category === "EXCURSIONS" ? "Excursion Trip" : trip.category}
                                 </span>
                                 {trip.isPublic && (
                                     <span className="px-3 py-1 rounded-full text-xs font-bold bg-zinc-800 text-zinc-400 ring-1 ring-zinc-700">Public Trip</span>

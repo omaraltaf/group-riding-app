@@ -17,7 +17,9 @@ import {
     X,
     Link as LinkIcon,
     Copy,
-    Clock
+    Clock,
+    Mountain,
+    Globe,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -56,6 +58,7 @@ interface Group {
     isMember: boolean;
     myStatus: string;
     status: string;
+    category: string;
     memberships: Member[];
     trips: Trip[];
     _count: {
@@ -202,7 +205,19 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                 <div className="mx-auto max-w-5xl px-6 h-full flex flex-col justify-end pb-8 relative z-10">
                     <div className="flex justify-between items-end">
                         <div>
-                            <h1 className="text-4xl font-black tracking-tight mb-2">{group.name}</h1>
+                            <div className="flex items-center gap-3 mb-3">
+                                <h1 className="text-4xl font-black tracking-tight">{group.name}</h1>
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-500/10 px-3 py-1 text-xs font-bold text-orange-500 ring-1 ring-inset ring-orange-500/20">
+                                    {group.category === "BIKES" && <Trophy className="h-3 w-3" />}
+                                    {group.category === "CARS_4X4" && <CarIcon className="h-3 w-3" />}
+                                    {group.category === "CYCLING" && <ChevronRight className="h-3 w-3" />}
+                                    {group.category === "EXCURSIONS" && <MapPin className="h-3 w-3" />}
+                                    {group.category === "BIKES" ? "Bike Group" :
+                                        group.category === "CARS_4X4" ? "Cars/4x4 Group" :
+                                            group.category === "CYCLING" ? "Cycling Group" :
+                                                group.category === "EXCURSIONS" ? "Excursion Group" : group.category}
+                                </span>
+                            </div>
                             <p className="text-zinc-400 max-w-2xl">{group.description}</p>
                         </div>
                         {group.isAdmin && (
