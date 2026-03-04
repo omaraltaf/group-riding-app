@@ -14,7 +14,7 @@ export async function POST(req: Request) {
         }
 
         const body = await req.json();
-        const { name, description, joinPolicy } = body;
+        const { name, description, joinPolicy, category } = body;
 
         if (!name) {
             return new NextResponse("Name is required", { status: 400 });
@@ -27,6 +27,7 @@ export async function POST(req: Request) {
                 name,
                 description,
                 joinPolicy: joinPolicy || "REQUEST_ONLY",
+                category: category || "BIKES",
                 status: "PENDING",
                 inviteCode,
                 creatorId: user.id,

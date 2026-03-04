@@ -5,6 +5,9 @@
 export function getConfiguredDatabaseUrl(rawUrl: string | undefined): string | undefined {
     if (!rawUrl) return undefined;
 
+    // Sanitize the URL by removing any surrounding quotes or whitespace
+    let url = rawUrl.trim().replace(/^["']|["']$/g, '');
+
     const currentBranch = process.env.VERCEL_GIT_COMMIT_REF || process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF;
 
     // List of branches that should use the development database (ep-long-leaf)
@@ -14,11 +17,9 @@ export function getConfiguredDatabaseUrl(rawUrl: string | undefined): string | u
         'feature/trip-categories'
     ];
 
-    let url = rawUrl;
-
     if (currentBranch && devBranches.includes(currentBranch)) {
         // Replace the Neon host prefix (ep-*) with the development database host
-        url = url.replace(/ep-[^.]+/, 'ep-long-leaf-aisgx9c1');
+        url = url.replace(/ep-[^.]+/, 'ep-icy-darkness-aie1t3lq');
     }
 
     // For migration scripts: automatically derive direct URL from pooled URL if needed

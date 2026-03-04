@@ -20,6 +20,7 @@ interface Trip {
     meetingPoint: string;
     terrainDifficulty: string;
     suitableVehicles: string;
+    category: string;
     group: {
         name: string;
     };
@@ -27,6 +28,14 @@ interface Trip {
         rsvps: number;
     };
 }
+
+const CATEGORIES = [
+    { id: "ALL", label: "All Adventures", icon: Car },
+    { id: "BIKES", label: "Bike Trips", icon: Trophy },
+    { id: "CARS_4X4", label: "Cars/4x4", icon: Car },
+    { id: "CYCLING", label: "Cycling", icon: ChevronRight },
+    { id: "EXCURSIONS", label: "Excursions", icon: MapPin },
+];
 
 export default function DiscoverTripsPage() {
     const [trips, setTrips] = useState<Trip[]>([]);
@@ -37,6 +46,7 @@ export default function DiscoverTripsPage() {
     const [fromDate, setFromDate] = useState("");
     const [toDate, setToDate] = useState("");
     const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
+    const [activeCategory, setActiveCategory] = useState("ALL");
 
     const fetchTrips = useCallback(async (isLoadMore = false) => {
         if (!isLoadMore) setLoading(true);
@@ -49,6 +59,7 @@ export default function DiscoverTripsPage() {
                 fromDate,
                 toDate,
                 limit: "10",
+                category: activeCategory,
             });
             if (isLoadMore && nextCursor) {
                 params.append("cursor", nextCursor);
@@ -76,20 +87,21 @@ export default function DiscoverTripsPage() {
             setLoading(false);
             setLoadingMore(false);
         }
-    }, [searchTerm, locationFilter, fromDate, toDate, nextCursor]);
+    }, [searchTerm, locationFilter, fromDate, toDate, nextCursor, activeCategory]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
             fetchTrips();
         }, 400);
         return () => clearTimeout(timer);
-    }, [searchTerm, locationFilter, fromDate, toDate]);
+    }, [searchTerm, locationFilter, fromDate, toDate, activeCategory]);
 
     const clearFilters = () => {
         setSearchTerm("");
         setLocationFilter("");
         setFromDate("");
         setToDate("");
+        setActiveCategory("ALL");
     };
 
     if (loading && trips.length === 0) {
@@ -111,6 +123,22 @@ export default function DiscoverTripsPage() {
                     <div className="h-12 w-12 bg-zinc-900 rounded-2xl flex items-center justify-center ring-1 ring-zinc-800">
                         <Car className="h-6 w-6 text-zinc-400" />
                     </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mb-10">
+                    {CATEGORIES.map((cat) => (
+                        <button
+                            key={cat.id}
+                            onClick={() => setActiveCategory(cat.id)}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeCategory === cat.id
+                                ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20"
+                                : "bg-zinc-900 text-zinc-400 hover:bg-zinc-800 ring-1 ring-zinc-800"
+                                }`}
+                        >
+                            <cat.icon className="h-4 w-4" />
+                            {cat.label}
+                        </button>
+                    ))}
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-4 w-full mb-12">

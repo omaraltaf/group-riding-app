@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Save, Globe, Lock } from "lucide-react";
+import { ChevronLeft, Save, Globe, Lock, Trophy, Car, MapPin, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 export default function CreateGroupPage() {
@@ -12,6 +12,7 @@ export default function CreateGroupPage() {
         name: "",
         description: "",
         joinPolicy: "REQUEST_ONLY", // OPEN, REQUEST_ONLY
+        category: "BIKES",
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -74,6 +75,31 @@ export default function CreateGroupPage() {
                                     className="w-full rounded-2xl bg-zinc-800 border-0 py-4 px-5 text-white ring-1 ring-zinc-700 focus:ring-2 focus:ring-orange-500 transition-all"
                                     placeholder="What is this group about? Who should join?"
                                 />
+                            </div>
+
+                            <div className="pt-6 space-y-4">
+                                <label className="text-sm font-medium text-zinc-400">Group Category</label>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    {[
+                                        { id: "BIKES", label: "Bikes", icon: Trophy },
+                                        { id: "CARS_4X4", label: "Cars/4x4", icon: Car },
+                                        { id: "CYCLING", label: "Cycling", icon: ChevronRight },
+                                        { id: "EXCURSIONS", label: "Excursions", icon: MapPin },
+                                    ].map((cat) => (
+                                        <button
+                                            key={cat.id}
+                                            type="button"
+                                            onClick={() => setFormData({ ...formData, category: cat.id })}
+                                            className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all ${formData.category === cat.id
+                                                ? "border-orange-500 bg-orange-500/5 ring-1 ring-orange-500/20"
+                                                : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                }`}
+                                        >
+                                            <cat.icon className={`h-6 w-6 ${formData.category === cat.id ? "text-orange-500" : "text-zinc-500"}`} />
+                                            <span className="text-xs font-bold">{cat.label}</span>
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
 
                             <div className="pt-6 space-y-4">

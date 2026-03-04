@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
         const toDate = searchParams.get("toDate");
         const limit = parseInt(searchParams.get("limit") || "10");
         const cursor = searchParams.get("cursor");
+        const category = searchParams.get("category");
 
         const where: any = {
             isPublic: true,
@@ -27,6 +28,10 @@ export async function GET(req: NextRequest) {
             ],
             meetingPoint: { contains: location, mode: "insensitive" },
         };
+
+        if (category && category !== "ALL") {
+            where.category = category;
+        }
 
         if (fromDate || toDate) {
             where.startTime = {};
@@ -46,6 +51,7 @@ export async function GET(req: NextRequest) {
                 meetingPoint: true,
                 terrainDifficulty: true,
                 suitableVehicles: true,
+                category: true,
                 group: { select: { name: true } },
                 _count: { select: { rsvps: { where: { status: "CONFIRMED" } } } }
             },

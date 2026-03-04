@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Users, Search, ChevronRight, Shield, Clock } from "lucide-react";
+import { Users, Search, ChevronRight, Shield, Clock, Trophy, Car, MapPin } from "lucide-react";
 import Link from "next/link";
 
 interface Group {
     id: string;
     name: string;
     description: string;
+    category: string;
     myStatus: string | null;
     myRole: string | null;
     _count: {
@@ -16,15 +17,28 @@ interface Group {
     };
 }
 
+const CATEGORIES = [
+    { id: "ALL", label: "All Groups", icon: Users },
+    { id: "BIKES", label: "Bike Groups", icon: Trophy },
+    { id: "CARS_4X4", label: "Cars/4x4", icon: Car },
+    { id: "CYCLING", label: "Cycling", icon: ChevronRight },
+    { id: "EXCURSIONS", label: "Excursions", icon: MapPin },
+];
+
 export default function ExploreGroupsPage() {
     const [groups, setGroups] = useState<Group[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
+    const [activeCategory, setActiveCategory] = useState("ALL");
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchGroups = async () => {
             try {
-                const res = await fetch(`/api/groups/discovery${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ""}`);
+                const params = new URLSearchParams();
+                if (searchQuery) params.append("q", searchQuery);
+                if (activeCategory !== "ALL") params.append("category", activeCategory);
+
+                const res = await fetch(`/api/groups/discovery?${params.toString()}`);
                 if (res.status === 401) {
                     window.location.href = "/login";
                     return;
@@ -41,7 +55,7 @@ export default function ExploreGroupsPage() {
 
         const timer = setTimeout(fetchGroups, 300);
         return () => clearTimeout(timer);
-    }, [searchQuery]);
+    }, [searchQuery, activeCategory]);
 
     return (
         <main className="min-h-screen bg-zinc-950 text-white pb-20">
@@ -54,6 +68,22 @@ export default function ExploreGroupsPage() {
                     <div className="h-12 w-12 bg-zinc-900 rounded-2xl flex items-center justify-center ring-1 ring-zinc-800">
                         <Users className="h-6 w-6 text-zinc-400" />
                     </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mb-10">
+                    {CATEGORIES.map((cat) => (
+                        <button
+                            key={cat.id}
+                            onClick={() => setActiveCategory(cat.id)}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeCategory === cat.id
+                                ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20"
+                                : "bg-zinc-900 text-zinc-400 hover:bg-zinc-800 ring-1 ring-zinc-800"
+                                }`}
+                        >
+                            <cat.icon className="h-4 w-4" />
+                            {cat.label}
+                        </button>
+                    ))}
                 </div>
 
                 <div className="mb-10 relative">

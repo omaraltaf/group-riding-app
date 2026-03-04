@@ -45,6 +45,7 @@ export async function POST(
             destination,
             destinationUrl,
             meetingPointUrl,
+            category,
         } = body;
 
         const tripStartTime = startTime ? new Date(startTime) : new Date();
@@ -69,6 +70,7 @@ export async function POST(
                 meetingPoint: meetingPoint || "",
                 itinerary: itinerary || "",
                 terrainDifficulty: terrainDifficulty || "Medium",
+                category: category || "BIKES",
                 suitableVehicles: suitableVehicles || "",
                 participantCap: (participantCap && !isNaN(parsedParticipantCap as number)) ? parsedParticipantCap : null,
                 isPublic: !!isPublic,

@@ -11,15 +11,22 @@ export async function GET(req: Request) {
 
         const { searchParams } = new URL(req.url);
         const query = searchParams.get("q") || "";
+        const category = searchParams.get("category");
+
+        const where: any = {
+            status: "APPROVED",
+            OR: [
+                { name: { contains: query, mode: "insensitive" } },
+                { description: { contains: query, mode: "insensitive" } },
+            ],
+        };
+
+        if (category && category !== "ALL") {
+            where.category = category;
+        }
 
         const groups = await prisma.group.findMany({
-            where: {
-                status: "APPROVED",
-                OR: [
-                    { name: { contains: query, mode: "insensitive" } },
-                    { description: { contains: query, mode: "insensitive" } },
-                ],
-            },
+            where,
             include: {
                 _count: {
                     select: {
