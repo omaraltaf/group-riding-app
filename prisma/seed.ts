@@ -57,7 +57,7 @@ async function main() {
 
         console.log("Creating groups and memberships...");
         for (let i = 0; i < groupData.length; i++) {
-            const group = await prisma.group.create({
+            const group = await (prisma.group.create as any)({
                 data: {
                     name: groupData[i].name,
                     description: groupData[i].description,
@@ -107,15 +107,15 @@ async function main() {
                     data: {
                         title: `${group.name} - ${tripTypes[k]}`,
                         description: `A ${tripTypes[k].toLowerCase()} for the ${group.name} community.`,
-                        category: group.category, // Use same category as group
+                        category: (group as any).category, // Use same category as group
                         startTime,
                         endTime,
                         meetingPoint: "Central Hub",
                         meetingPointUrl: "https://www.google.com/maps/search/?api=1&query=Central+Hub+London",
                         destination: "Scenic Lookout",
                         destinationUrl: "https://www.google.com/maps/search/?api=1&query=Scenic+Lookout",
-                        terrainDifficulty: k === 0 ? "Easy" : (k === 1 ? "Medium" : "Hard"),
-                        status: k === 0 ? "UPCOMING" : "UPCOMING",
+                        terrainDifficulty: k === 0 ? "Easy" : (k === 1 ? "Moderate" : "Challenging"),
+                        status: "UPCOMING",
                         groupId: group.id,
                         creatorId: users[i].id,
                     }

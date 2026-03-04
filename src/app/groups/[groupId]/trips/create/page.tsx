@@ -16,6 +16,8 @@ import {
     Lock,
     Trophy,
     ChevronRight,
+    Bike,
+    Compass,
 } from "lucide-react";
 import Link from "next/link";
 import AddressAutocomplete from "@/components/address-autocomplete";
@@ -110,8 +112,8 @@ export default function CreateTripPage({ params }: { params: Promise<{ groupId: 
                                 {[
                                     { id: "BIKES", label: "Bikes", icon: Trophy },
                                     { id: "CARS_4X4", label: "Cars/4x4", icon: Car },
-                                    { id: "CYCLING", label: "Cycling", icon: ChevronRight },
-                                    { id: "EXCURSIONS", label: "Excursions", icon: MapPin },
+                                    { id: "CYCLING", label: "Cycling", icon: Bike },
+                                    { id: "EXCURSIONS", label: "Excursions", icon: Compass },
                                 ].map((cat) => (
                                     <button
                                         key={cat.id}
