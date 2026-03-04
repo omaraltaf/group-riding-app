@@ -7,7 +7,7 @@ import {
     Users as UsersIcon,
     Search,
     Car,
-    Trophy,
+    Motorbike,
     ChevronRight,
     Bike,
     Compass
@@ -33,7 +33,7 @@ interface Trip {
 
 const CATEGORIES = [
     { id: "ALL", label: "All Adventures", icon: Car },
-    { id: "BIKES", label: "Bike Trips", icon: Trophy },
+    { id: "BIKES", label: "Bike Trips", icon: Motorbike },
     { id: "CARS_4X4", label: "Cars/4x4", icon: Car },
     { id: "CYCLING", label: "Cycling", icon: Bike },
     { id: "EXCURSIONS", label: "Excursions", icon: Compass },

@@ -18,6 +18,7 @@ import {
     ChevronRight,
     Bike,
     Compass,
+    Motorbike,
 } from "lucide-react";
 import Link from "next/link";
 import AddressAutocomplete from "@/components/address-autocomplete";
@@ -110,7 +111,7 @@ export default function CreateTripPage({ params }: { params: Promise<{ groupId: 
                             <label className="text-sm font-medium text-zinc-400">Trip Category</label>
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                 {[
-                                    { id: "BIKES", label: "Bikes", icon: Trophy },
+                                    { id: "BIKES", label: "Bikes", icon: Motorbike },
                                     { id: "CARS_4X4", label: "Cars/4x4", icon: Car },
                                     { id: "CYCLING", label: "Cycling", icon: Bike },
                                     { id: "EXCURSIONS", label: "Excursions", icon: Compass },

@@ -21,6 +21,7 @@ import {
     Globe,
     Bike,
     Compass,
+    Motorbike,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -191,7 +192,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ tripId: s
                                     {trip.terrainDifficulty}
                                 </span>
                                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-orange-500/10 text-orange-500 ring-1 ring-orange-500/20 flex items-center gap-1.5">
-                                    {trip.category === "BIKES" && <Trophy className="h-3 w-3" />}
+                                    {trip.category === "BIKES" && <Motorbike className="h-3 w-3" />}
                                     {trip.category === "CARS_4X4" && <Car className="h-3 w-3" />}
                                     {trip.category === "CYCLING" && <Bike className="h-3 w-3" />}
                                     {trip.category === "EXCURSIONS" && <Compass className="h-3 w-3" />}

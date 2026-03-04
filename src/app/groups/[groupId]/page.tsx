@@ -22,6 +22,7 @@ import {
     Globe,
     Bike,
     Compass,
+    Motorbike,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -210,7 +211,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                             <div className="flex items-center gap-3 mb-3">
                                 <h1 className="text-4xl font-black tracking-tight">{group.name}</h1>
                                 <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-500/10 px-3 py-1 text-xs font-bold text-orange-500 ring-1 ring-inset ring-orange-500/20">
-                                    {group.category === "BIKES" && <Trophy className="h-3 w-3" />}
+                                    {group.category === "BIKES" && <Motorbike className="h-3 w-3" />}
                                     {group.category === "CARS_4X4" && <CarIcon className="h-3 w-3" />}
                                     {group.category === "CYCLING" && <Bike className="h-3 w-3" />}
                                     {group.category === "EXCURSIONS" && <Compass className="h-3 w-3" />}

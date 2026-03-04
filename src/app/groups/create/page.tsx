@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Save, Globe, Lock, Trophy, Car, MapPin, ChevronRight, Bike, Compass } from "lucide-react";
+import { ChevronLeft, Save, Globe, Lock, Trophy, Car, MapPin, ChevronRight, Bike, Compass, Motorbike } from "lucide-react";
 import Link from "next/link";
 
 export default function CreateGroupPage() {
@@ -81,7 +81,7 @@ export default function CreateGroupPage() {
                                 <label className="text-sm font-medium text-zinc-400">Group Category</label>
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                     {[
-                                        { id: "BIKES", label: "Bikes", icon: Trophy },
+                                        { id: "BIKES", label: "Bikes", icon: Motorbike },
                                         { id: "CARS_4X4", label: "Cars/4x4", icon: Car },
                                         { id: "CYCLING", label: "Cycling", icon: Bike },
                                         { id: "EXCURSIONS", label: "Excursions", icon: Compass },

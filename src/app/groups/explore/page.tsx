@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Users, Search, ChevronRight, Shield, Clock, Trophy, Car, MapPin, Bike, Compass } from "lucide-react";
+import { Users, Search, ChevronRight, Shield, Clock, Trophy, Car, MapPin, Bike, Compass, Motorbike } from "lucide-react";
 import Link from "next/link";
 
 interface Group {
@@ -19,7 +19,7 @@ interface Group {
 
 const CATEGORIES = [
     { id: "ALL", label: "All Groups", icon: Users },
-    { id: "BIKES", label: "Bike Groups", icon: Trophy },
+    { id: "BIKES", label: "Bike Groups", icon: Motorbike },
     { id: "CARS_4X4", label: "Cars/4x4", icon: Car },
     { id: "CYCLING", label: "Cycling", icon: Bike },
     { id: "EXCURSIONS", label: "Excursions", icon: Compass },
