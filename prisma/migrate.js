@@ -14,12 +14,13 @@ function getDatabaseUrl() {
     // Feature branch database switching
     const devBranches = [
         'feature/vehicle-agnostic-v2',
-        'update-vehicle-type'
+        'update-vehicle-type',
+        'feature/trip-categories'
     ];
 
     if (currentBranch && devBranches.includes(currentBranch)) {
-        // Use development database host (ep-long-leaf)
-        url = url.replace(/ep-[^.]+/, 'ep-long-leaf-aisgx9c1');
+        // Use development database host, preserving -pooler suffix if present
+        url = url.replace(/ep-[a-z0-9-]+?(?=-pooler\.|\.|$)/, 'ep-icy-darkness-aie1t3lq');
     }
 
     // Handle Neon pooled URLs by deriving direct connection
