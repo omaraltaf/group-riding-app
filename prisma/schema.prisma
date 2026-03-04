@@ -28,6 +28,13 @@ enum RSVPStatus {
   MAYBE
 }
 
+enum TripCategory {
+  BIKES
+  CARS_4X4
+  CYCLING
+  EXCURSIONS
+}
+
 model User {
   id                String         @id @default(cuid())
   email             String?        @unique
@@ -54,6 +61,7 @@ model Group {
   name          String
   description   String?
   image         String?
+  category      TripCategory   @default(BIKES)
   joinPolicy    JoinPolicy     @default(OPEN)
   inviteCode    String?        @unique
   status        String         @default("PENDING")
@@ -86,6 +94,7 @@ model Trip {
   id                String         @id @default(cuid())
   title             String
   description       String?
+  category          TripCategory   @default(BIKES)
   startTime         DateTime
   endTime           DateTime?
   meetingPoint      String
@@ -112,6 +121,7 @@ model Trip {
   @@index([startTime])
   @@index([isPublic])
   @@index([status])
+  @@index([category])
 }
 
 model RSVP {

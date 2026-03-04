@@ -46,12 +46,13 @@ async function main() {
             users.push(user);
         }
 
-        // Define groups
+        // Define groups with categories
         const groupData = [
-            { name: "City Commuters", description: "Daily urban participants weaving through traffic.", joinPolicy: "PUBLIC" },
-            { name: "Off-Road Warriors", description: "Dirt and gravel enthusiasts seeking rugged adventures.", joinPolicy: "REQUEST_ONLY" },
-            { name: "Midnight Cruisers", description: "Late night trips under the city lights.", joinPolicy: "PRIVATE" },
-            { name: "Track Day Elite", description: "Professional-grade training and track sessions.", joinPolicy: "PRIVATE" },
+            { name: "City Commuters", description: "Daily urban participants weaving through traffic.", joinPolicy: "PUBLIC", category: "BIKES" },
+            { name: "Off-Road Warriors", description: "Dirt and gravel enthusiasts seeking rugged adventures.", joinPolicy: "REQUEST_ONLY", category: "CARS_4X4" },
+            { name: "Midnight Cruisers", description: "Late night trips under the city lights.", joinPolicy: "PRIVATE", category: "CYCLING" },
+            { name: "Track Day Elite", description: "Professional-grade training and track sessions.", joinPolicy: "PRIVATE", category: "BIKES" },
+            { name: "Alpine Hikers", description: "Scenic excursions and mountain treks.", joinPolicy: "PUBLIC", category: "EXCURSIONS" },
         ];
 
         console.log("Creating groups and memberships...");
@@ -61,6 +62,7 @@ async function main() {
                     name: groupData[i].name,
                     description: groupData[i].description,
                     joinPolicy: groupData[i].joinPolicy as any,
+                    category: groupData[i].category as any,
                     status: "APPROVED",
                     inviteCode: `JOIN-${groupData[i].name.replace(/\s+/g, '-').toUpperCase()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
                     creatorId: users[i].id,
@@ -105,6 +107,7 @@ async function main() {
                     data: {
                         title: `${group.name} - ${tripTypes[k]}`,
                         description: `A ${tripTypes[k].toLowerCase()} for the ${group.name} community.`,
+                        category: group.category, // Use same category as group
                         startTime,
                         endTime,
                         meetingPoint: "Central Hub",

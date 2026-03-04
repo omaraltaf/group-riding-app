@@ -10,7 +10,8 @@ export function getConfiguredDatabaseUrl(rawUrl: string | undefined): string | u
     // List of branches that should use the development database (ep-long-leaf)
     const devBranches = [
         'feature/vehicle-agnostic-v2',
-        'update-vehicle-type'
+        'update-vehicle-type',
+        'feature/trip-categories'
     ];
 
     let url = rawUrl;
