@@ -36,7 +36,7 @@ export async function GET(
 
         const isCreator = group.creatorId === user.id;
         const membership = group.memberships.find((m: any) => m.userId === user.id);
-        const isPlatformAdmin = user.role === "PARTICIPANT" || user.role === "PLATFORM_ADMIN";
+        const isPlatformAdmin = user.role === "PLATFORM_ADMIN";
         const isAdmin = isPlatformAdmin || membership?.role === "ADMIN";
 
         // If group is not approved, only creator and platform admins can see it

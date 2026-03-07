@@ -15,7 +15,7 @@ export async function PATCH(req: Request) {
         const body = await req.json();
         const { name, phone, vehicleTypes, vehicleExperience, image, pushOptIn, targetUserId } = body;
 
-        const isPlatformAdmin = user.role === "PARTICIPANT" || user.role === "PLATFORM_ADMIN"; // Standardized roles
+        const isPlatformAdmin = user.role === "PLATFORM_ADMIN"; // Standardized roles
         const finalUserId = (isPlatformAdmin && targetUserId) ? targetUserId : user.id;
 
         const updatedUser = await prisma.user.update({
