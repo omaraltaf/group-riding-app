@@ -23,6 +23,10 @@ import {
     Bike,
     Compass,
     Motorbike,
+    MoreVertical,
+    UserPlus,
+    UserMinus,
+    UserCog
 } from "lucide-react";
 import Link from "next/link";
 
@@ -439,12 +443,17 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                                     <button
                                                         onClick={() => handleRoleUpdate(member.userId, member.role === "ADMIN" ? "MEMBER" : "ADMIN")}
                                                         disabled={isUpdatingRole === member.userId}
-                                                        className={`text-[10px] font-bold px-2 py-1 rounded-md transition-all uppercase tracking-wider disabled:opacity-50 ${member.role === "ADMIN"
-                                                            ? "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 ring-1 ring-zinc-700"
-                                                            : "bg-orange-600 text-white hover:bg-orange-500 shadow-lg active:scale-95"
+                                                        title={member.role === "ADMIN" ? "Remove Organizer" : "Make Organizer"}
+                                                        className={`p-2 rounded-xl transition-all disabled:opacity-50 ${member.role === "ADMIN"
+                                                            ? "bg-orange-500/10 text-orange-500 hover:bg-orange-500/20 ring-1 ring-orange-500/20"
+                                                            : "bg-zinc-800 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-700 ring-1 ring-zinc-700"
                                                             }`}
                                                     >
-                                                        {isUpdatingRole === member.userId ? "..." : (member.role === "ADMIN" ? "Remove Organizer" : "Make Organizer")}
+                                                        {isUpdatingRole === member.userId ? (
+                                                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                                                        ) : (
+                                                            <Shield className="h-4 w-4" />
+                                                        )}
                                                     </button>
                                                 )}
                                                 <div className="flex gap-2">
