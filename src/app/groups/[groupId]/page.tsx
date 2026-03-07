@@ -168,7 +168,10 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
         }
     };
 
-    const handleRoleUpdate = async (userId: string, role: string) => {
+    const handleRoleUpdate = async (userId: string, role: string, userName: string) => {
+        const action = role === "ADMIN" ? "promote to Organizer" : "remove as Organizer";
+        if (!confirm(`Are you sure you want to ${action} ${userName}?`)) return;
+
         setIsUpdatingRole(userId);
         try {
             const res = await fetch(`/api/groups/${groupId}/members`, {
@@ -441,7 +444,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                             <div className="flex items-center gap-2">
                                                 {group.isAdmin && member.userId !== group.creatorId && (
                                                     <button
-                                                        onClick={() => handleRoleUpdate(member.userId, member.role === "ADMIN" ? "MEMBER" : "ADMIN")}
+                                                        onClick={() => handleRoleUpdate(member.userId, member.role === "ADMIN" ? "MEMBER" : "ADMIN", member.user.name)}
                                                         disabled={isUpdatingRole === member.userId}
                                                         title={member.role === "ADMIN" ? "Remove Organizer" : "Make Organizer"}
                                                         className={`p-2 rounded-xl transition-all disabled:opacity-50 ${member.role === "ADMIN"
