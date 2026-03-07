@@ -62,6 +62,7 @@ interface Group {
     myStatus: string;
     status: string;
     category: string;
+    creatorId: string;
     memberships: Member[];
     trips: Trip[];
     _count: {
@@ -81,6 +82,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
     const [showApprovalConfirm, setShowApprovalConfirm] = useState(false);
     const [pendingStatus, setPendingStatus] = useState<string | null>(null);
     const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+    const [isUpdatingRole, setIsUpdatingRole] = useState<string | null>(null);
 
     useEffect(() => {
         fetch(`/api/groups/${groupId}`)
@@ -159,6 +161,32 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
             }
         } catch (err) {
             console.error(err);
+        }
+    };
+
+    const handleRoleUpdate = async (userId: string, role: string) => {
+        setIsUpdatingRole(userId);
+        try {
+            const res = await fetch(`/api/groups/${groupId}/members`, {
+                method: "PATCH",
+                body: JSON.stringify({ userId, role }),
+                headers: { "Content-Type": "application/json" },
+            });
+            if (res.ok) {
+                setGroup(prev => {
+                    if (!prev) return null;
+                    return {
+                        ...prev,
+                        memberships: (prev.memberships || []).map(m =>
+                            m.userId === userId ? { ...m, role } : m
+                        )
+                    };
+                });
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsUpdatingRole(null);
         }
     };
 
@@ -395,21 +423,42 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                                     )}
                                                 </div>
                                                 <Link href={`/profile/${member.userId}`} className="hover:underline">
-                                                    <p className="text-sm font-bold">{member.user.name}</p>
+                                                    <p className="text-sm font-bold flex items-center gap-1.5">
+                                                        {member.user.name}
+                                                        {member.userId === group.creatorId && (
+                                                            <span className="inline-flex items-center rounded-md bg-orange-500/10 px-1.5 py-0.5 text-[10px] font-bold text-orange-500 ring-1 ring-inset ring-orange-500/20 uppercase tracking-wider">
+                                                                Founder
+                                                            </span>
+                                                        )}
+                                                    </p>
                                                     <p className="text-xs text-zinc-500">{member.role === "ADMIN" ? "Organizer" : "Member"}</p>
                                                 </Link>
                                             </div>
-                                            <div className="flex gap-2">
-                                                {member.user.vehicleExperience && (
-                                                    <div className="h-8 w-8 rounded-lg bg-zinc-800 flex items-center justify-center" title={member.user.vehicleExperience}>
-                                                        <Trophy className="h-4 w-4 text-zinc-500" />
-                                                    </div>
+                                            <div className="flex items-center gap-2">
+                                                {group.isAdmin && member.userId !== group.creatorId && (
+                                                    <button
+                                                        onClick={() => handleRoleUpdate(member.userId, member.role === "ADMIN" ? "MEMBER" : "ADMIN")}
+                                                        disabled={isUpdatingRole === member.userId}
+                                                        className={`text-[10px] font-bold px-2 py-1 rounded-md transition-all uppercase tracking-wider disabled:opacity-50 ${member.role === "ADMIN"
+                                                            ? "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 ring-1 ring-zinc-700"
+                                                            : "bg-orange-600 text-white hover:bg-orange-500 shadow-lg active:scale-95"
+                                                            }`}
+                                                    >
+                                                        {isUpdatingRole === member.userId ? "..." : (member.role === "ADMIN" ? "Remove Organizer" : "Make Organizer")}
+                                                    </button>
                                                 )}
-                                                {member.user.vehicleTypes && (
-                                                    <div className="h-8 w-8 rounded-lg bg-zinc-800 flex items-center justify-center" title={member.user.vehicleTypes}>
-                                                        <CarIcon className="h-4 w-4 text-zinc-500" />
-                                                    </div>
-                                                )}
+                                                <div className="flex gap-2">
+                                                    {member.user.vehicleExperience && (
+                                                        <div className="h-8 w-8 rounded-lg bg-zinc-800 flex items-center justify-center" title={member.user.vehicleExperience}>
+                                                            <Trophy className="h-4 w-4 text-zinc-500" />
+                                                        </div>
+                                                    )}
+                                                    {member.user.vehicleTypes && (
+                                                        <div className="h-8 w-8 rounded-lg bg-zinc-800 flex items-center justify-center" title={member.user.vehicleTypes}>
+                                                            <CarIcon className="h-4 w-4 text-zinc-500" />
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
