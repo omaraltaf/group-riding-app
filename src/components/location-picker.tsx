@@ -87,6 +87,8 @@ export default function LocationPicker({
     }, [debouncedSearch, isLoaded]);
 
     const handleSelectSuggestion = async (suggestion: any) => {
+        if (!suggestion.placePrediction) return;
+
         setLoadingSuggestions(true);
         try {
             // New Place Details API (v3) using the Place class
@@ -216,15 +218,15 @@ export default function LocationPicker({
                                 <div className="flex-1 overflow-y-auto space-y-1 custom-scrollbar pr-2">
                                     {suggestions.map((suggestion: any) => (
                                         <button
-                                            key={suggestion.placePrediction.placeId}
+                                            key={suggestion.placePrediction?.placeId || Math.random().toString()}
                                             onClick={() => handleSelectSuggestion(suggestion)}
                                             className="w-full text-left p-3 rounded-xl hover:bg-zinc-800 transition-all group"
                                         >
                                             <p className="text-sm font-bold text-white group-hover:text-orange-500 transition-colors line-clamp-1">
-                                                {suggestion.placePrediction.text.mainText.text}
+                                                {suggestion.placePrediction?.mainText?.text || "Unknown location"}
                                             </p>
                                             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider line-clamp-1">
-                                                {suggestion.placePrediction.text.secondaryText?.text}
+                                                {suggestion.placePrediction?.secondaryText?.text || ""}
                                             </p>
                                         </button>
                                     ))}
