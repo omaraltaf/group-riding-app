@@ -37,24 +37,12 @@ export default function LocationPicker({
 
     const debouncedSearch = useDebounce(searchQuery, 300);
     const sessionTokenRef = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
-    const autocompleteServiceRef = useRef<google.maps.places.AutocompleteService | null>(null);
-    const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
     const mapRef = useRef<google.maps.Map | null>(null);
 
     const { isLoaded } = useJsApiLoader({
         googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
         libraries,
     });
-
-    // Initialize services
-    useEffect(() => {
-        if (isLoaded && !autocompleteServiceRef.current) {
-            autocompleteServiceRef.current = new google.maps.places.AutocompleteService();
-            // PlacesService needs a div or map instance
-            const dummyDiv = document.createElement("div");
-            placesServiceRef.current = new google.maps.places.PlacesService(dummyDiv);
-        }
-    }, [isLoaded]);
 
     // Handle session token generation
     const getSessionToken = () => {
