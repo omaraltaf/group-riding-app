@@ -90,6 +90,7 @@ export default function LocationPicker({
         setLoadingSuggestions(true);
         try {
             // New Place Details API (v3) using the Place class
+            // @ts-ignore
             const { place } = await google.maps.places.Place.fetchFields({
                 id: suggestion.placePrediction.placeId,
                 fields: ["displayName", "formattedAddress", "location"],
