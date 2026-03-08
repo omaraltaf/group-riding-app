@@ -225,17 +225,17 @@ export default function LocationPicker({
                                 </div>
 
                                 <div className="flex-1 overflow-y-auto space-y-1 custom-scrollbar pr-2">
-                                    {suggestions.map((suggestion) => (
+                                    {suggestions.map((suggestion: any) => (
                                         <button
-                                            key={suggestion.place_id}
+                                            key={suggestion.placePrediction.placeId}
                                             onClick={() => handleSelectSuggestion(suggestion)}
                                             className="w-full text-left p-3 rounded-xl hover:bg-zinc-800 transition-all group"
                                         >
                                             <p className="text-sm font-bold text-white group-hover:text-orange-500 transition-colors line-clamp-1">
-                                                {suggestion.structured_formatting.main_text}
+                                                {suggestion.placePrediction.text.mainText.text}
                                             </p>
                                             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider line-clamp-1">
-                                                {suggestion.structured_formatting.secondary_text}
+                                                {suggestion.placePrediction.text.secondaryText?.text}
                                             </p>
                                         </button>
                                     ))}
