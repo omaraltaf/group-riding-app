@@ -17,7 +17,7 @@ import {
     Trash2
 } from "lucide-react";
 import Link from "next/link";
-import AddressAutocomplete from "@/components/address-autocomplete";
+import LocationPicker from "@/components/location-picker";
 
 export default function EditTripPage({ params }: { params: Promise<{ tripId: string }> }) {
     const { tripId } = use(params);
@@ -189,10 +189,10 @@ export default function EditTripPage({ params }: { params: Promise<{ tripId: str
                                 />
                             </div>
 
-                            <AddressAutocomplete
+                            <LocationPicker
                                 required
                                 label="Meeting Point"
-                                placeholder="Start typing address..."
+                                placeholder="Search or pick on map..."
                                 value={formData.meetingPoint}
                                 onChange={(address, url) => setFormData({
                                     ...formData,
@@ -203,7 +203,7 @@ export default function EditTripPage({ params }: { params: Promise<{ tripId: str
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <AddressAutocomplete
+                            <LocationPicker
                                 label="Destination"
                                 placeholder="Where are we heading?"
                                 value={formData.destination}
