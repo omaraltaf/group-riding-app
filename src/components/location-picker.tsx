@@ -70,73 +70,84 @@ export default function LocationPicker({
 
     // Fetch suggestions
     useEffect(() => {
-        if (!debouncedSearch || debouncedSearch.length < 3 || !autocompleteServiceRef.current) {
+        if (!debouncedSearch || debouncedSearch.length < 3 || !isLoaded) {
             setSuggestions([]);
             return;
         }
 
-        setLoadingSuggestions(true);
-        autocompleteServiceRef.current.getPlacePredictions(
-            {
-                input: debouncedSearch,
-                sessionToken: getSessionToken(),
-            },
-            (predictions, status) => {
-                if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
-                    setSuggestions(predictions);
-                } else {
-                    setSuggestions([]);
-                }
+        const fetchSuggestions = async () => {
+            setLoadingSuggestions(true);
+            try {
+                // New Autocomplete Suggestion API (v3)
+                const { suggestions: newSuggestions } = await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+                    input: debouncedSearch,
+                    sessionToken: getSessionToken(),
+                });
+
+                // Map to compatible format if needed, or just set suggestions
+                // @ts-ignore - The types might not be fully updated in all envs yet
+                setSuggestions(newSuggestions);
+            } catch (status) {
+                console.error("Autocomplete error:", status);
+                setSuggestions([]);
+            } finally {
                 setLoadingSuggestions(false);
             }
-        );
-    }, [debouncedSearch]);
+        };
 
-    const handleSelectSuggestion = (prediction: google.maps.places.AutocompletePrediction) => {
-        if (!placesServiceRef.current) return;
+        fetchSuggestions();
+    }, [debouncedSearch, isLoaded]);
 
+    const handleSelectSuggestion = async (suggestion: any) => {
         setLoadingSuggestions(true);
-        placesServiceRef.current.getDetails(
-            {
-                placeId: prediction.place_id,
-                fields: ["name", "formatted_address", "geometry"],
+        try {
+            // New Place Details API (v3) using the Place class
+            const { place } = await google.maps.places.Place.fetchFields({
+                id: suggestion.placePrediction.placeId,
+                fields: ["displayName", "formattedAddress", "location"],
                 sessionToken: getSessionToken(),
-            },
-            (place, status) => {
-                if (status === google.maps.places.PlacesServiceStatus.OK && place && place.geometry?.location) {
-                    const lat = place.geometry.location.lat();
-                    const lng = place.geometry.location.lng();
-                    const address = place.formatted_address || place.name || "";
+            });
 
-                    setSelectedPlace({ address, lat, lng });
-                    setMarkerPos({ lat, lng });
-                    setMapCenter({ lat, lng });
-                    setSearchQuery(address);
-                    setSuggestions([]);
-                    clearSessionToken(); // Recycle token after successful Place Details
-                }
-                setLoadingSuggestions(false);
+            if (place && place.location) {
+                const lat = place.location.lat();
+                const lng = place.location.lng();
+                const address = place.formattedAddress || place.displayName || "";
+
+                setSelectedPlace({ address, lat, lng });
+                setMarkerPos({ lat, lng });
+                setMapCenter({ lat, lng });
+                setSearchQuery(address);
+                setSuggestions([]);
+                clearSessionToken(); // Link billing and recycle token
             }
-        );
+        } catch (err) {
+            console.error("Place details error:", err);
+        } finally {
+            setLoadingSuggestions(false);
+        }
     };
 
-    const handleMapClick = (e: google.maps.MapMouseEvent) => {
-        if (!e.latLng || !placesServiceRef.current) return;
+    const handleMapClick = async (e: google.maps.MapMouseEvent) => {
+        if (!e.latLng) return;
 
         const lat = e.latLng.lat();
         const lng = e.latLng.lng();
 
         setMarkerPos({ lat, lng });
 
-        // Reverse geocode to get address
-        const geocoder = new google.maps.Geocoder();
-        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-            if (status === "OK" && results && results[0]) {
+        try {
+            // Reverse geocode
+            const geocoder = new google.maps.Geocoder();
+            const { results } = await geocoder.geocode({ location: { lat, lng } });
+
+            if (results && results[0]) {
                 const address = results[0].formatted_address;
                 setSelectedPlace({ address, lat, lng });
                 setSearchQuery(address);
             }
-        });
+        } catch (err) {
+            console.error("Geocoding error:", err);
+        }
     };
 
     const handleConfirm = () => {
